@@ -147,6 +147,6 @@ api/          serializers y routers DRF
 ## 9. EXTENSIONES PARA EL VISUAL STUDIO COTE (OPCIONALES)
 ```
 GitLens       Para saber quien cambia partes del repositorio y colaborar mas
-CodeSpellChecker        Dtetecta errores ortograficos en el codigo 
-RidiculousCoding        Lo hace mas chistoso y con soniditos
+Code Spell Checker (idioma)        Detecta errores ortograficos en el codigo 
+Ridiculous Coding        Lo hace mas chistoso y con soniditos
 ```
