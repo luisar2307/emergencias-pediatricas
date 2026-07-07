@@ -13,4 +13,5 @@ router.register(r"evaluacion", TriajeViewSet, basename="triajes")
 
 urlpatterns = [
     path("", include(router.urls)),
+    path('patients/', include('patients.urls')),
 ]
