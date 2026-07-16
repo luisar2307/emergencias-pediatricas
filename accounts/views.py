@@ -6,6 +6,7 @@ from rest_framework.status import HTTP_400_BAD_REQUEST, HTTP_200_OK
 from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate, get_user_model
 
+from .permissions import RolPermission
 from .serializers import (
     UsuarioSerializer,
     UsuarioCreateSerializer,
@@ -18,6 +19,7 @@ Usuario = get_user_model()
 
 class UsuarioViewSet(viewsets.ModelViewSet):
     queryset = Usuario.objects.all()
+    permission_classes = [RolPermission]
 
     def get_serializer_class(self):
         if self.action == 'create':

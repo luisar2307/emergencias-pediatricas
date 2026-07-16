@@ -2,6 +2,7 @@ from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from .models import Paciente, Tutor
+from accounts.permissions import RolPermission
 
 from .serializers import (
     PacienteSerializer,
@@ -13,6 +14,7 @@ from .serializers import (
 
 class PacienteViewSet(viewsets.ModelViewSet):
     queryset = Paciente.objects.prefetch_related('tutores', 'antecedente_medico').all()
+    permission_classes = [RolPermission]
 
     def get_serializer_class(self):
         if self.action == 'list':
