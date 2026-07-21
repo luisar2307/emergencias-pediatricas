@@ -51,6 +51,7 @@ accounts/
   admin.py
   apps.py
   models.py
+  permissions.py
   serializers.py
   tests.py
   urls.py
@@ -190,6 +191,170 @@ jobs:
 
 <file path="accounts/apps.py">
 
+</file>
+
+<file path="accounts/permissions.py">
+from rest_framework.permissions import BasePermission, SAFE_METHODS
+
+
+def is_medico(user):
+    return getattr(user, 'rol', None) == 'medico'
+
+
+def is_enfermero(user):
+    return getattr(user, 'rol', None) == 'enfermero'
+
+
+def is_recepcion(user):
+    return getattr(user, 'rol', None) == 'recepcion'
+
+
+def is_admin(user):
+    return getattr(user, 'rol', None) == 'admin'
+
+
+class RolPermission(BasePermission):
+    def has_permission(self, request, view):
+        user = request.user
+        if not user or not user.is_authenticated:
+            return False
+
+        view_name = view.__class__.__name__
+        action = getattr(view, 'action', None)
+
+        if view_name == 'UsuarioViewSet':
+            return self._has_usuario_permission(user, action)
+        if view_name == 'PersonalMedicoViewSet':
+            return self._has_personal_medico_permission(user, action)
+        if view_name == 'PacienteViewSet':
+            return self._has_paciente_permission(user, action)
+        if view_name == 'TutorViewSet':
+            return self._has_tutor_permission(user, action)
+        if view_name == 'TriajeViewSet':
+            return self._has_triaje_permission(user, action)
+
+        return False
+
+    def has_object_permission(self, request, view, obj):
+        user = request.user
+        if is_admin(user):
+            return True
+
+        view_name = view.__class__.__name__
+        action = getattr(view, 'action', None)
+
+        if view_name == 'UsuarioViewSet':
+            return self._has_usuario_object_permission(user, action, obj)
+        if view_name == 'PersonalMedicoViewSet':
+            return self._has_personal_medico_object_permission(user, action, obj)
+        if view_name == 'PacienteViewSet':
+            return self._has_paciente_object_permission(user, action, obj)
+        if view_name == 'TutorViewSet':
+            return self._has_tutor_object_permission(user, action, obj)
+        if view_name == 'TriajeViewSet':
+            return self._has_triaje_object_permission(user, action, obj)
+
+        return False
+
+    def _has_usuario_permission(self, user, action):
+        if action == 'list':
+            return is_admin(user)
+        if action == 'create':
+            return is_admin(user) or is_recepcion(user)
+        if action in ['retrieve', 'update', 'partial_update']:
+            return is_admin(user) or is_recepcion(user) or is_medico(user) or is_enfermero(user)
+        if action == 'destroy':
+            return is_admin(user)
+        return False
+
+    def _has_usuario_object_permission(self, user, action, obj):
+        if action in ['retrieve', 'update', 'partial_update']:
+            return obj == user
+        return False
+
+    def _has_personal_medico_permission(self, user, action):
+        if action == 'list':
+            return is_admin(user) or is_medico(user) or is_enfermero(user)
+        if action == 'retrieve':
+            return is_admin(user) or is_medico(user) or is_enfermero(user)
+        if action == 'create':
+            return is_admin(user)
+        if action in ['update', 'partial_update']:
+            return is_admin(user) or is_medico(user)
+        if action == 'destroy':
+            return is_admin(user)
+        return False
+
+    def _has_personal_medico_object_permission(self, user, action, obj):
+        if action in SAFE_METHODS:
+            return is_admin(user) or is_medico(user) or is_enfermero(user)
+        if action in ['update', 'partial_update']:
+            return is_admin(user) or (is_medico(user) and getattr(obj, 'user', None) == user)
+        return False
+
+    def _has_paciente_permission(self, user, action):
+        if action == 'list':
+            return is_admin(user) or is_recepcion(user) or is_medico(user) or is_enfermero(user)
+        if action == 'retrieve':
+            return is_admin(user) or is_recepcion(user) or is_medico(user) or is_enfermero(user)
+        if action == 'create':
+            return is_admin(user) or is_recepcion(user)
+        if action in ['update', 'partial_update']:
+            return is_admin(user) or is_recepcion(user) or is_medico(user)
+        if action == 'destroy':
+            return is_admin(user)
+        if action == 'agregar_tutor':
+            return is_admin(user) or is_recepcion(user)
+        if action == 'tutores':
+            return is_admin(user) or is_recepcion(user) or is_medico(user) or is_enfermero(user)
+        return False
+
+    def _has_paciente_object_permission(self, user, action, obj):
+        if action in SAFE_METHODS:
+            return is_admin(user) or is_recepcion(user) or is_medico(user) or is_enfermero(user)
+        if action in ['update', 'partial_update']:
+            return is_admin(user) or is_recepcion(user) or is_medico(user)
+        return False
+
+    def _has_tutor_permission(self, user, action):
+        if action == 'list':
+            return is_admin(user) or is_recepcion(user) or is_medico(user) or is_enfermero(user)
+        if action == 'retrieve':
+            return is_admin(user) or is_recepcion(user) or is_medico(user) or is_enfermero(user)
+        if action == 'create':
+            return is_admin(user) or is_recepcion(user)
+        if action in ['update', 'partial_update']:
+            return is_admin(user) or is_recepcion(user)
+        if action == 'destroy':
+            return is_admin(user)
+        return False
+
+    def _has_tutor_object_permission(self, user, action, obj):
+        if action in SAFE_METHODS:
+            return is_admin(user) or is_recepcion(user) or is_medico(user) or is_enfermero(user)
+        if action in ['update', 'partial_update']:
+            return is_admin(user) or is_recepcion(user)
+        return False
+
+    def _has_triaje_permission(self, user, action):
+        if action == 'list':
+            return is_admin(user) or is_medico(user) or is_enfermero(user)
+        if action == 'retrieve':
+            return is_admin(user) or is_medico(user) or is_enfermero(user)
+        if action == 'create':
+            return is_admin(user) or is_medico(user)
+        if action in ['update', 'partial_update']:
+            return is_admin(user) or is_medico(user)
+        if action == 'destroy':
+            return is_admin(user)
+        return False
+
+    def _has_triaje_object_permission(self, user, action, obj):
+        if action in SAFE_METHODS:
+            return is_admin(user) or is_medico(user) or is_enfermero(user)
+        if action in ['update', 'partial_update']:
+            return is_admin(user) or is_medico(user)
+        return False
 </file>
 
 <file path="accounts/serializers.py">
@@ -512,20 +677,6 @@ class PersonalMedicoSerializer(serializers.ModelSerializer):
 
 </file>
 
-<file path="staff/views.py">
-# views/staff.py
-from rest_framework import viewsets
-from rest_framework.permissions import IsAuthenticated
-from .models import PersonalMedico
-from .serializers import PersonalMedicoSerializer
-
-
-class PersonalMedicoViewSet(viewsets.ModelViewSet):
-    queryset = PersonalMedico.objects.all().select_related("user")
-    serializer_class = PersonalMedicoSerializer
-    permission_classes = [IsAuthenticated]
-</file>
-
 <file path="triage/migrations/__init__.py">
 
 </file>
@@ -615,61 +766,8 @@ class Migration(migrations.Migration):
 
 </file>
 
-<file path="triage/serializers.py">
-from rest_framework import serializers
-from .models import Triaje
-from patients.serializers import PacienteSerializer
-from staff.serializers import PersonalMedicoSerializer
-
-
-# Serializer para Escritura (POST, PUT) - Recibe IDs numéricos simples
-class TriajeSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Triaje
-        fields = [
-            "id",
-            "paciente",
-            "personal",
-            "frecuencia_cardiaca",
-            "frecuencia_respiratoria",
-            "temperatura",
-            "saturacion_oxigeno",
-            "nivel_urgencia",
-            "fecha_registro",
-        ]
-
-
-# Serializer para Lectura (GET) - Expone la información completa detallada
-class TriajeDetalleSerializer(serializers.ModelSerializer):
-    paciente = PacienteSerializer(read_only=True)
-    personal = PersonalMedicoSerializer(read_only=True)
-
-    class Meta:
-        model = Triaje
-        fields = "__all__"
-</file>
-
 <file path="triage/tests.py">
 
-</file>
-
-<file path="triage/views.py">
-from rest_framework import viewsets
-from rest_framework.permissions import IsAuthenticated
-from .models import Triaje
-from .serializers import TriajeSerializer, TriajeDetalleSerializer
-
-
-class TriajeViewSet(viewsets.ModelViewSet):
-    queryset = Triaje.objects.all().select_related("paciente", "personal__user")
-    permission_classes = [IsAuthenticated]
-
-    # Alterna dinámicamente los serializers según la acción (Lectura vs Escritura)
-    def get_serializer_class(self):
-        if self.action in ["list", "retrieve"]:
-            return TriajeDetalleSerializer
-        return TriajeSerializer
 </file>
 
 <file path=".env.example">
@@ -791,71 +889,6 @@ class Migration(migrations.Migration):
     ]
 </file>
 
-<file path="accounts/views.py">
-from rest_framework import viewsets
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny
-from rest_framework.response import Response
-from rest_framework.status import HTTP_400_BAD_REQUEST, HTTP_200_OK
-from rest_framework.authtoken.models import Token
-from django.contrib.auth import authenticate, get_user_model
-
-from .serializers import (
-    UsuarioSerializer,
-    UsuarioCreateSerializer,
-    UsuarioUpdateSerializer,
-    UsuarioListSerializer
-)
-
-Usuario = get_user_model()
-
-
-class UsuarioViewSet(viewsets.ModelViewSet):
-    queryset = Usuario.objects.all()
-
-    def get_serializer_class(self):
-        if self.action == 'create':
-            return UsuarioCreateSerializer
-        if self.action in ['update', 'partial_update']:
-            return UsuarioUpdateSerializer
-        if self.action == 'list':
-            return UsuarioListSerializer
-        return UsuarioSerializer
-
-
-@api_view(['POST'])
-@permission_classes([AllowAny])
-def login(request):
-    username = request.data.get('username')
-    password = request.data.get('password')
-    
-    if not username or not password:
-        return Response(
-            {'error': 'Username y password son requeridos'},
-            status=HTTP_400_BAD_REQUEST
-        )
-    
-    user = authenticate(username=username, password=password)
-    
-    if not user:
-        return Response(
-            {'error': 'Credenciales inválidas'},
-            status=HTTP_400_BAD_REQUEST
-        )
-    
-    token, _ = Token.objects.get_or_create(user=user)
-    
-    return Response(
-        {
-            'token': token.key,
-            'user_id': user.id,
-            'username': user.username,
-            'email': user.email,
-        },
-        status=HTTP_200_OK
-    )
-</file>
-
 <file path="config/settings.py">
 from pathlib import Path
 from decouple import config
@@ -917,7 +950,7 @@ WSGI_APPLICATION = "config.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
+        "ENGINE": "django.db.backends.postgresql",
         "NAME": BASE_DIR / "db.sqlite3",
     }
 }
@@ -1254,51 +1287,6 @@ class PacienteListSerializer(serializers.ModelSerializer):
         return principal.nombre_completo if principal else None
 </file>
 
-<file path="patients/views.py">
-from rest_framework import viewsets, status
-from rest_framework.decorators import action
-from rest_framework.response import Response
-from .models import Paciente, Tutor
-
-from .serializers import (
-    PacienteSerializer,
-    PacienteCreateUpdateSerializer,
-    PacienteListSerializer,
-    TutorSerializer
-)
-
-
-class PacienteViewSet(viewsets.ModelViewSet):
-    queryset = Paciente.objects.prefetch_related('tutores', 'antecedente_medico').all()
-
-    def get_serializer_class(self):
-        if self.action == 'list':
-            return PacienteListSerializer
-        if self.action in ['create', 'update', 'partial_update']:
-            return PacienteCreateUpdateSerializer
-        return PacienteSerializer
-
-    @action(detail=True, methods=['post'])
-    def agregar_tutor(self, request, pk=None):
-        paciente = self.get_object()
-        serializer = TutorSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save(paciente=paciente)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-    @action(detail=True, methods=['get'])
-    def tutores(self, request, pk=None):
-        paciente = self.get_object()
-        tutores = paciente.tutores.all()
-        serializer = TutorSerializer(tutores, many=True)
-        return Response(serializer.data)
-
-
-class TutorViewSet(viewsets.ModelViewSet):
-    queryset = Tutor.objects.select_related('paciente').all()
-    serializer_class = TutorSerializer
-</file>
-
 <file path="staff/models.py">
 from django.db import models
 from django.conf import settings
@@ -1314,23 +1302,129 @@ class PersonalMedico(models.Model):
         return f"{self.user.get_full_name() or self.user.username} - {self.especialidad}"
 </file>
 
-<file path="triage/models.py">
-from django.db import models
-from django.utils import timezone
+<file path="staff/views.py">
+# views/staff.py
+from rest_framework import viewsets
+from .models import PersonalMedico
+from .serializers import PersonalMedicoSerializer
+from accounts.permissions import RolPermission
 
 
-class Triaje(models.Model):
-    paciente = models.ForeignKey("patients.Paciente", on_delete=models.CASCADE)
-    personal = models.ForeignKey("staff.PersonalMedico", on_delete=models.SET_NULL, null=True)
-    frecuencia_cardiaca = models.PositiveIntegerField(null=True, blank=True)
-    frecuencia_respiratoria = models.PositiveIntegerField(null=True, blank=True)
-    temperatura = models.DecimalField(max_digits=4, decimal_places=1, null=True, blank=True)
-    saturacion_oxigeno = models.PositiveIntegerField(null=True, blank=True)
-    nivel_urgencia = models.CharField(max_length=32, blank=True)
-    fecha_registro = models.DateTimeField(default=timezone.now)
+class PersonalMedicoViewSet(viewsets.ModelViewSet):
+    queryset = PersonalMedico.objects.all().select_related("user")
+    serializer_class = PersonalMedicoSerializer
+    permission_classes = [RolPermission]
+</file>
 
-    def __str__(self):
-        return f"Triaje {self.id} - {self.paciente} - {self.nivel_urgencia}"
+<file path="triage/serializers.py">
+from rest_framework import serializers
+from .models import Triaje
+from patients.serializers import PacienteSerializer
+from staff.serializers import PersonalMedicoSerializer
+
+
+# Serializer para Escritura (POST, PUT) - Recibe IDs numéricos simples
+class TriajeSerializer(serializers.ModelSerializer):
+    nivel_urgencia = serializers.CharField(read_only=True)
+
+    class Meta:
+        model = Triaje
+        fields = [
+            "id",
+            "paciente",
+            "personal",
+            "frecuencia_cardiaca",
+            "frecuencia_respiratoria",
+            "temperatura",
+            "saturacion_oxigeno",
+            "nivel_urgencia",
+            "fecha_registro",
+        ]
+
+    def validate(self, data):
+        required_fields = [
+            "frecuencia_cardiaca",
+            "frecuencia_respiratoria",
+            "temperatura",
+            "saturacion_oxigeno",
+        ]
+        missing = [field for field in required_fields if field not in data or data[field] is None]
+        if missing:
+            raise serializers.ValidationError(
+                {
+                    "detail": (
+                        "Los siguientes campos son requeridos para el triaje: "
+                        + ", ".join(missing)
+                    )
+                }
+            )
+
+        temperatura = data["temperatura"]
+        if temperatura < 30 or temperatura > 45:
+            raise serializers.ValidationError(
+                {"temperatura": "Temperatura fuera de rango válido (30.0 - 45.0)."}
+            )
+
+        frecuencia_cardiaca = data["frecuencia_cardiaca"]
+        if frecuencia_cardiaca < 20 or frecuencia_cardiaca > 240:
+            raise serializers.ValidationError(
+                {"frecuencia_cardiaca": "Frecuencia cardíaca fuera de rango válido (20 - 240)."}
+            )
+
+        frecuencia_respiratoria = data["frecuencia_respiratoria"]
+        if frecuencia_respiratoria < 5 or frecuencia_respiratoria > 60:
+            raise serializers.ValidationError(
+                {"frecuencia_respiratoria": "Frecuencia respiratoria fuera de rango válido (5 - 60)."}
+            )
+
+        saturacion = data["saturacion_oxigeno"]
+        if saturacion < 50 or saturacion > 100:
+            raise serializers.ValidationError(
+                {"saturacion_oxigeno": "Saturación de oxígeno fuera de rango válido (50 - 100)."}
+            )
+
+        return data
+
+    def create(self, validated_data):
+        triaje = Triaje(**validated_data)
+        triaje.nivel_urgencia = triaje.calcular_nivel_urgencia()
+        triaje.save()
+        return triaje
+
+    def update(self, instance, validated_data):
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.nivel_urgencia = instance.calcular_nivel_urgencia()
+        instance.save()
+        return instance
+
+
+# Serializer para Lectura (GET) - Expone la información completa detallada
+class TriajeDetalleSerializer(serializers.ModelSerializer):
+    paciente = PacienteSerializer(read_only=True)
+    personal = PersonalMedicoSerializer(read_only=True)
+
+    class Meta:
+        model = Triaje
+        fields = "__all__"
+</file>
+
+<file path="triage/views.py">
+from rest_framework import viewsets
+from .models import Triaje
+from accounts.permissions import RolPermission
+from .serializers import TriajeSerializer, TriajeDetalleSerializer
+
+
+class TriajeViewSet(viewsets.ModelViewSet):
+    queryset = Triaje.objects.all().select_related("paciente", "personal__user")
+    permission_classes = [RolPermission]
+
+    # Alterna dinámicamente los serializers según la acción (Lectura vs Escritura)
+    def get_serializer_class(self):
+        if self.action in ["list", "retrieve"]:
+            return TriajeDetalleSerializer
+        return TriajeSerializer
 </file>
 
 <file path="requirements.txt">
@@ -1388,25 +1482,196 @@ class Usuario(AbstractUser):
         return self.rol == 'admin'
 </file>
 
-<file path="api/urls.py">
-from django.urls import path, include
-from rest_framework.routers import DefaultRouter
+<file path="accounts/views.py">
+from rest_framework import viewsets
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
+from rest_framework.status import HTTP_400_BAD_REQUEST, HTTP_200_OK
+from rest_framework.authtoken.models import Token
+from django.contrib.auth import authenticate, get_user_model
 
-# Import viewsets from apps
-from staff.views import PersonalMedicoViewSet
-from patients.views import PacienteViewSet
-from triage.views import TriajeViewSet
-from accounts.views import UsuarioViewSet
+from .permissions import RolPermission
+from .serializers import (
+    UsuarioSerializer,
+    UsuarioCreateSerializer,
+    UsuarioUpdateSerializer,
+    UsuarioListSerializer
+)
 
-router = DefaultRouter()
-router.register(r"medicos", PersonalMedicoViewSet, basename="personal-medico")
-router.register(r"registro", PacienteViewSet, basename="pacientes")
-router.register(r"evaluacion", TriajeViewSet, basename="triajes")
-router.register(r"usuarios", UsuarioViewSet, basename="usuario")
-urlpatterns = [
-    path("login", login, name="login"),
-    path("", include(router.urls)),
-]
+Usuario = get_user_model()
+
+
+class UsuarioViewSet(viewsets.ModelViewSet):
+    queryset = Usuario.objects.all()
+    permission_classes = [RolPermission]
+
+    def get_serializer_class(self):
+        if self.action == 'create':
+            return UsuarioCreateSerializer
+        if self.action in ['update', 'partial_update']:
+            return UsuarioUpdateSerializer
+        if self.action == 'list':
+            return UsuarioListSerializer
+        return UsuarioSerializer
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def login(request):
+    username = request.data.get('username')
+    password = request.data.get('password')
+    
+    if not username or not password:
+        return Response(
+            {'error': 'Username y password son requeridos'},
+            status=HTTP_400_BAD_REQUEST
+        )
+    
+    user = authenticate(username=username, password=password)
+    
+    if not user:
+        return Response(
+            {'error': 'Credenciales inválidas'},
+            status=HTTP_400_BAD_REQUEST
+        )
+    
+    token, _ = Token.objects.get_or_create(user=user)
+    
+    return Response(
+        {
+            'token': token.key,
+            'user_id': user.id,
+            'username': user.username,
+            'email': user.email,
+        },
+        status=HTTP_200_OK
+    )
+</file>
+
+<file path="patients/views.py">
+from rest_framework import viewsets, status
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from .models import Paciente, Tutor
+from accounts.permissions import RolPermission
+
+from .serializers import (
+    PacienteSerializer,
+    PacienteCreateUpdateSerializer,
+    PacienteListSerializer,
+    TutorSerializer
+)
+
+
+class PacienteViewSet(viewsets.ModelViewSet):
+    queryset = Paciente.objects.prefetch_related('tutores', 'antecedente_medico').all()
+    permission_classes = [RolPermission]
+
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return PacienteListSerializer
+        if self.action in ['create', 'update', 'partial_update']:
+            return PacienteCreateUpdateSerializer
+        return PacienteSerializer
+
+    @action(detail=True, methods=['post'])
+    def agregar_tutor(self, request, pk=None):
+        paciente = self.get_object()
+        serializer = TutorSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(paciente=paciente)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    @action(detail=True, methods=['get'])
+    def tutores(self, request, pk=None):
+        paciente = self.get_object()
+        tutores = paciente.tutores.all()
+        serializer = TutorSerializer(tutores, many=True)
+        return Response(serializer.data)
+
+
+class TutorViewSet(viewsets.ModelViewSet):
+    queryset = Tutor.objects.select_related('paciente').all()
+    serializer_class = TutorSerializer
+</file>
+
+<file path="triage/models.py">
+from django.db import models
+from django.utils import timezone
+
+
+class Triaje(models.Model):
+    URGENCIA_CRITICO = "critico"
+    URGENCIA_URGENTE = "urgente"
+    URGENCIA_MODERADO = "moderado"
+    URGENCIA_NORMAL = "normal"
+
+    URGENCIA_CHOICES = [
+        (URGENCIA_CRITICO, "Crítico"),
+        (URGENCIA_URGENTE, "Urgente"),
+        (URGENCIA_MODERADO, "Moderado"),
+        (URGENCIA_NORMAL, "Normal"),
+    ]
+
+    paciente = models.ForeignKey("patients.Paciente", on_delete=models.CASCADE)
+    personal = models.ForeignKey("staff.PersonalMedico", on_delete=models.SET_NULL, null=True)
+    frecuencia_cardiaca = models.PositiveIntegerField(null=True, blank=True)
+    frecuencia_respiratoria = models.PositiveIntegerField(null=True, blank=True)
+    temperatura = models.DecimalField(max_digits=4, decimal_places=1, null=True, blank=True)
+    saturacion_oxigeno = models.PositiveIntegerField(null=True, blank=True)
+    nivel_urgencia = models.CharField(max_length=32, choices=URGENCIA_CHOICES, blank=True)
+    fecha_registro = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return f"Triaje {self.id} - {self.paciente} - {self.nivel_urgencia}"
+
+    def calcular_nivel_urgencia(self):
+        """Calcula el nivel de urgencia según signos vitales."""
+        if self.frecuencia_cardiaca is not None:
+            if self.frecuencia_cardiaca > 180 or self.frecuencia_cardiaca < 60:
+                return self.URGENCIA_CRITICO
+        if self.frecuencia_respiratoria is not None:
+            if self.frecuencia_respiratoria > 40:
+                return self.URGENCIA_CRITICO
+        if self.temperatura is not None:
+            if self.temperatura >= 40.0 or self.temperatura <= 35.0:
+                return self.URGENCIA_CRITICO
+        if self.saturacion_oxigeno is not None:
+            if self.saturacion_oxigeno < 90:
+                return self.URGENCIA_CRITICO
+
+        if self.frecuencia_cardiaca is not None:
+            if self.frecuencia_cardiaca >= 140:
+                return self.URGENCIA_URGENTE
+        if self.frecuencia_respiratoria is not None:
+            if self.frecuencia_respiratoria >= 31:
+                return self.URGENCIA_URGENTE
+        if self.temperatura is not None:
+            if self.temperatura >= 39.0:
+                return self.URGENCIA_URGENTE
+        if self.saturacion_oxigeno is not None:
+            if self.saturacion_oxigeno < 94:
+                return self.URGENCIA_URGENTE
+
+        if self.frecuencia_cardiaca is not None:
+            if self.frecuencia_cardiaca >= 120:
+                return self.URGENCIA_MODERADO
+        if self.frecuencia_respiratoria is not None:
+            if self.frecuencia_respiratoria >= 26:
+                return self.URGENCIA_MODERADO
+        if self.temperatura is not None:
+            if self.temperatura >= 38.0:
+                return self.URGENCIA_MODERADO
+        if self.saturacion_oxigeno is not None:
+            if self.saturacion_oxigeno < 96:
+                return self.URGENCIA_MODERADO
+
+        return self.URGENCIA_NORMAL
+
+    def save(self, *args, **kwargs):
+        self.nivel_urgencia = self.calcular_nivel_urgencia()
+        super().save(*args, **kwargs)
 </file>
 
 <file path="patients/models.py">
@@ -1656,6 +1921,27 @@ GitLens       Para saber quien cambia partes del repositorio y colaborar mas
 Code Spell Checker (idioma)        Detecta errores ortograficos en el codigo 
 Ridiculous Coding        Lo hace mas chistoso y con soniditos
 ```
+</file>
+
+<file path="api/urls.py">
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from accounts.views import UsuarioViewSet, login
+# Import viewsets from apps
+from staff.views import PersonalMedicoViewSet
+from patients.views import PacienteViewSet
+from triage.views import TriajeViewSet
+from accounts.views import UsuarioViewSet
+
+router = DefaultRouter()
+router.register(r"medicos", PersonalMedicoViewSet, basename="personal-medico")
+router.register(r"registro", PacienteViewSet, basename="pacientes")
+router.register(r"evaluacion", TriajeViewSet, basename="triajes")
+router.register(r"usuarios", UsuarioViewSet, basename="usuario")
+urlpatterns = [
+    path("login", login, name="login"),
+    path("", include(router.urls)),
+]
 </file>
 
 </files>
