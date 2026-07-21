@@ -9,7 +9,7 @@ class Usuario(AbstractUser):
         ('recepcion', 'Recepción'),
         ('admin', 'Administrador'),
     ]
-    
+
     rol = models.CharField(
         max_length=20,
         choices=ROLES,
@@ -18,6 +18,8 @@ class Usuario(AbstractUser):
     )
     telefono = models.CharField(max_length=20, blank=True, verbose_name='Teléfono')
     cedula_profesional = models.CharField(max_length=20, blank=True, verbose_name='Cédula Profesional')
+
+    REQUIRED_FIELDS = ['email', 'rol']
 
     class Meta:
         db_table = 'usuarios'
