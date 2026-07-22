@@ -1,0 +1,159 @@
+{% extends "core/base.html" %}
+
+{% block title %}
+{{ titulo }}
+{% endblock %}
+
+{% block content %}
+
+<style>
+    .form-container {
+        max-width: 850px;
+        margin: 0 auto;
+    }
+
+    .form-card {
+        padding: 28px;
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 5px 20px rgba(15, 23, 42, 0.08);
+    }
+
+    .form-header {
+        margin-bottom: 24px;
+    }
+
+    .form-header h1 {
+        margin: 0;
+        color: #1e293b;
+    }
+
+    .form-header p {
+        margin: 7px 0 0;
+        color: #64748b;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+    }
+
+    .form-group.full {
+        grid-column: 1 / -1;
+    }
+
+    .form-group label {
+        font-weight: 700;
+        color: #334155;
+    }
+
+    .form-control {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 12px;
+        border: 1px solid #cbd5e1;
+        border-radius: 9px;
+        font-size: 15px;
+    }
+
+    .error {
+        color: #b91c1c;
+        font-size: 13px;
+    }
+
+    .form-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+        margin-top: 26px;
+    }
+
+    .cancel-button,
+    .save-button {
+        padding: 12px 20px;
+        border-radius: 9px;
+        text-decoration: none;
+        font-weight: 700;
+    }
+
+    .cancel-button {
+        background: #e2e8f0;
+        color: #334155;
+    }
+
+    .save-button {
+        border: none;
+        background: #2563eb;
+        color: white;
+        cursor: pointer;
+    }
+
+    @media (max-width: 700px) {
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="form-container">
+    <div class="form-card">
+        <div class="form-header">
+            <h1>{{ titulo }}</h1>
+            <p>
+                El nivel de urgencia se calculará automáticamente
+                según los signos vitales.
+            </p>
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+
+            {% if formulario.non_field_errors %}
+                <div class="error">
+                    {{ formulario.non_field_errors }}
+                </div>
+            {% endif %}
+
+            <div class="form-grid">
+                {% for campo in formulario %}
+                    <div class="form-group {% if campo.name == 'paciente' or campo.name == 'personal' %}full{% endif %}">
+                        <label for="{{ campo.id_for_label }}">
+                            {{ campo.label }}
+                        </label>
+
+                        {{ campo }}
+
+                        {% if campo.help_text %}
+                            <small>{{ campo.help_text }}</small>
+                        {% endif %}
+
+                        {% for error in campo.errors %}
+                            <span class="error">
+                                {{ error }}
+                            </span>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+            </div>
+
+            <div class="form-actions">
+                <a href="{% url 'triaje' %}" class="cancel-button">
+                    Cancelar
+                </a>
+
+                <button type="submit" class="save-button">
+                    {{ texto_boton }}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

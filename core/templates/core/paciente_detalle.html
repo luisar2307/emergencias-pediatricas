@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Detalle del paciente</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f4f7fb;
+            color: #1f2937;
+        }
+
+        .page-container {
+            min-height: 100vh;
+        }
+
+        .topbar {
+            height: 78px;
+            background: #ffffff;
+            border-bottom: 1px solid #dfe7f1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 42px;
+            box-shadow: 0 2px 10px rgba(15, 23, 42, 0.05);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .brand-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #2563eb, #0ea5e9);
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 25px;
+        }
+
+        .brand-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .brand-subtitle {
+            margin-top: 4px;
+            font-size: 13px;
+            color: #64748b;
+        }
+
+        .back-link {
+            text-decoration: none;
+            background: #ffffff;
+            color: #334155;
+            border: 1px solid #cbd5e1;
+            padding: 11px 18px;
+            border-radius: 9px;
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .content {
+            width: calc(100% - 80px);
+            max-width: 1400px;
+            margin: 34px auto 60px;
+        }
+
+        .header-section {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .page-title h1 {
+            font-size: 32px;
+            color: #0f172a;
+        }
+
+        .page-title p {
+            margin-top: 8px;
+            color: #64748b;
+            font-size: 15px;
+        }
+
+        .actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .action-button {
+            min-width: 130px;
+            text-align: center;
+            text-decoration: none;
+            padding: 12px 18px;
+            border-radius: 9px;
+            font-weight: 700;
+            font-size: 14px;
+            transition: 0.2s;
+        }
+
+        .edit-button {
+            background: #2563eb;
+            color: #ffffff;
+        }
+
+        .edit-button:hover {
+            background: #1d4ed8;
+        }
+
+        .delete-button {
+            background: #ffffff;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+        }
+
+        .delete-button:hover {
+            background: #fef2f2;
+        }
+
+        .patient-card {
+            background: #ffffff;
+            border: 1px solid #dfe7f1;
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 14px 35px rgba(15, 23, 42, 0.08);
+        }
+
+        .patient-header {
+            background: linear-gradient(135deg, #1d4ed8, #2563eb);
+            color: #ffffff;
+            padding: 28px 34px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .patient-avatar {
+            width: 72px;
+            height: 72px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.17);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 34px;
+        }
+
+        .patient-header h2 {
+            font-size: 26px;
+        }
+
+        .patient-header p {
+            margin-top: 6px;
+            color: rgba(255, 255, 255, 0.82);
+            font-size: 14px;
+        }
+
+        .patient-body {
+            padding: 34px;
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 24px;
+        }
+
+        .detail-item {
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 18px;
+            background: #f8fafc;
+        }
+
+        .detail-item.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .detail-label {
+            color: #64748b;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .detail-value {
+            margin-top: 8px;
+            color: #0f172a;
+            font-size: 16px;
+            font-weight: 700;
+            line-height: 1.5;
+        }
+
+        .empty-value {
+            color: #94a3b8;
+            font-weight: 600;
+        }
+
+        .bottom-actions {
+            margin-top: 28px;
+            padding-top: 24px;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="page-container">
+
+    <header class="topbar">
+        <div class="brand">
+            <div class="brand-icon">✚</div>
+
+            <div>
+                <div class="brand-title">
+                    Emergencias Pediátricas
+                </div>
+
+                <div class="brand-subtitle">
+                    Detalle del paciente
+                </div>
+            </div>
+        </div>
+
+        <a href="{% url 'pacientes' %}" class="back-link">
+            ← Volver al listado
+        </a>
+    </header>
+
+    <main class="content">
+
+        <div class="header-section">
+            <div class="page-title">
+                <h1>Información del paciente</h1>
+
+                <p>
+                    Consulta los datos personales y clínicos registrados.
+                </p>
+            </div>
+
+            <div class="actions">
+                <a
+                    href="{% url 'paciente_editar' paciente.id %}"
+                    class="action-button edit-button"
+                >
+                    Editar paciente
+                </a>
+
+                <a
+                    href="{% url 'paciente_eliminar' paciente.id %}"
+                    class="action-button delete-button"
+                >
+                    Eliminar
+                </a>
+            </div>
+        </div>
+
+        <section class="patient-card">
+
+            <div class="patient-header">
+                <div class="patient-avatar">👶</div>
+
+                <div>
+                    <h2>
+                        {{ paciente.nombre }}
+                        {{ paciente.apellido }}
+                    </h2>
+
+                    <p>
+                        Historia clínica:
+                        {{ paciente.historia_clinica }}
+                    </p>
+                </div>
+            </div>
+
+            <div class="patient-body">
+
+                <div class="details-grid">
+
+                    <div class="detail-item">
+                        <div class="detail-label">
+                            Historia clínica
+                        </div>
+
+                        <div class="detail-value">
+                            {{ paciente.historia_clinica }}
+                        </div>
+                    </div>
+
+                    <div class="detail-item">
+                        <div class="detail-label">
+                            Fecha de nacimiento
+                        </div>
+
+                        <div class="detail-value">
+                            {{ paciente.fecha_nacimiento|date:"d/m/Y" }}
+                        </div>
+                    </div>
+
+                    <div class="detail-item">
+                        <div class="detail-label">
+                            Edad
+                        </div>
+
+                        <div class="detail-value">
+                            {{ paciente.edad }} años
+                        </div>
+                    </div>
+
+                    <div class="detail-item">
+                        <div class="detail-label">
+                            Sexo
+                        </div>
+
+                        <div class="detail-value">
+                            {{ paciente.get_sexo_display }}
+                        </div>
+                    </div>
+
+                    <div class="detail-item">
+                        <div class="detail-label">
+                            Tutor o representante
+                        </div>
+
+                        <div class="detail-value">
+                            {% if paciente.nombre_tutor %}
+                                {{ paciente.nombre_tutor }}
+                            {% else %}
+                                <span class="empty-value">
+                                    No registrado
+                                </span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="detail-item">
+                        <div class="detail-label">
+                            Teléfono de emergencia
+                        </div>
+
+                        <div class="detail-value">
+                            {% if paciente.telefono_emergencia %}
+                                {{ paciente.telefono_emergencia }}
+                            {% else %}
+                                <span class="empty-value">
+                                    No registrado
+                                </span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="detail-item full-width">
+                        <div class="detail-label">
+                            Alergias conocidas
+                        </div>
+
+                        <div class="detail-value">
+                            {% if paciente.alergias %}
+                                {{ paciente.alergias|linebreaksbr }}
+                            {% else %}
+                                <span class="empty-value">
+                                    No se registraron alergias
+                                </span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="detail-item">
+                        <div class="detail-label">
+                            Fecha de registro
+                        </div>
+
+                        <div class="detail-value">
+                            {{ paciente.created_at|date:"d/m/Y H:i" }}
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="bottom-actions">
+                    <a
+                        href="{% url 'pacientes' %}"
+                        class="action-button delete-button"
+                        style="color: #475569; border-color: #cbd5e1;"
+                    >
+                        Volver
+                    </a>
+
+                    <a
+                        href="{% url 'paciente_editar' paciente.id %}"
+                        class="action-button edit-button"
+                    >
+                        Editar información
+                    </a>
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+</body>
+</html>
