@@ -3,7 +3,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const sidebarOverlay = document.getElementById("sidebarOverlay");
     const menuButton = document.getElementById("menuButton");
     const sidebarClose = document.getElementById("sidebarClose");
-    const currentDate = document.getElementById("currentDate");
+   const currentDay = document.getElementById("currentDay");
 
     function openSidebar() {
         if (!sidebar || !sidebarOverlay) {

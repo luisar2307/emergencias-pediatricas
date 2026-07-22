@@ -523,20 +523,6 @@
             background: #f8fbff;
         }
 
-        .date-icon {
-            display: grid;
-
-            width: 35px;
-            height: 35px;
-
-            place-items: center;
-
-            border-radius: 10px;
-
-            background: var(--primary-soft);
-
-            font-size: 17px;
-        }
 
         .date-card strong,
         .date-card span {
@@ -1543,7 +1529,7 @@
 
                 <div class="date-card">
 
-                    <span class="date-icon">📅</span>
+                    <span class="date-icon" id="currentDay">--</span>
 
                     <div>
                         <strong>Fecha actual</strong>
@@ -1880,37 +1866,40 @@
 
                                             <div class="actions">
 
-                                                {% if permisos.ver_paciente %}
-                                                    <button
-                                                        type="button"
-                                                        class="action-button"
-                                                        title="Detalle pendiente"
-                                                    >
-                                                        👁
-                                                    </button>
-                                                {% endif %}
+                                     {% if permisos.ver_paciente %}
+                                         <a
+                                             href="{% url 'paciente_detalle' paciente.id %}"
+                                                class="action-button"
+                                                title="Ver paciente"
+                                                aria-label="Ver paciente"
+                                        >
+                                                👁
+                                            </a>
+                                        {% endif %}
 
-                                                {% if permisos.editar_paciente %}
-                                                    <button
-                                                        type="button"
-                                                        class="action-button"
-                                                        title="Edición pendiente"
-                                                    >
-                                                        ✎
-                                                    </button>
-                                                {% endif %}
+                                        {% if permisos.editar_paciente %}
+                                            <a
+                                                href="{% url 'paciente_editar' paciente.id %}"
+                                                class="action-button"
+                                                title="Editar paciente"
+                                                aria-label="Editar paciente"
+                                        >
+                                                  ✎
+                                             </a>
+                                         {% endif %}
 
-                                                {% if permisos.eliminar_paciente %}
-                                                    <button
-                                                        type="button"
-                                                        class="action-button danger"
-                                                        title="Eliminación pendiente"
-                                                    >
-                                                        🗑
-                                                    </button>
-                                                {% endif %}
+                                         {% if permisos.eliminar_paciente %}
+                                             <a
+                                                href="{% url 'paciente_eliminar' paciente.id %}"
+                                                class="action-button danger"
+                                                title="Eliminar paciente"
+                                                aria-label="Eliminar paciente"
+                                         >
+                                                    🗑
+                                                </a>
+                                            {% endif %}
 
-                                            </div>
+                                        </div>
 
                                         </td>
 
