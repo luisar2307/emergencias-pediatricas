@@ -1,0 +1,137 @@
+{% extends "core/base.html" %}
+
+{% block title %}
+    Eliminar personal
+{% endblock %}
+
+{% block page_title %}
+    Eliminar personal médico
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .staff-delete-card {
+        max-width: 600px;
+        margin: 40px auto;
+        padding: 35px;
+        border: 1px solid #fecaca;
+        border-radius: 24px;
+        text-align: center;
+        background: white;
+    }
+
+    .staff-delete-icon {
+        display: grid;
+        place-items: center;
+        width: 86px;
+        height: 86px;
+        margin: 0 auto 20px;
+        border-radius: 50%;
+        color: #dc2626;
+        font-size: 38px;
+        background: #fee2e2;
+    }
+
+    .staff-delete-card h2 {
+        color: #0f172a;
+    }
+
+    .staff-delete-card p {
+        color: #64748b;
+        line-height: 1.7;
+    }
+
+    .staff-delete-warning {
+        margin: 20px 0;
+        padding: 14px;
+        border-radius: 12px;
+        color: #991b1b;
+        background: #fef2f2;
+    }
+
+    .staff-delete-actions {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        margin-top: 25px;
+    }
+
+    .staff-delete-confirm,
+    .staff-delete-cancel {
+        padding: 12px 18px;
+        border-radius: 12px;
+        font-family: inherit;
+        font-weight: 800;
+        text-decoration: none;
+    }
+
+    .staff-delete-confirm {
+        border: none;
+        color: white;
+        cursor: pointer;
+        background: #dc2626;
+    }
+
+    .staff-delete-cancel {
+        color: #475569;
+        background: #f1f5f9;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<section class="staff-delete-card">
+
+    <div class="staff-delete-icon">
+        <i class="fa-solid fa-user-xmark"></i>
+    </div>
+
+    <h2>
+        ¿Eliminar este personal?
+    </h2>
+
+    <p>
+        Vas a eliminar el registro médico de
+        <strong>
+            {% if personal.user.get_full_name %}
+                {{ personal.user.get_full_name }}
+            {% else %}
+                {{ personal.user.username }}
+            {% endif %}
+        </strong>.
+    </p>
+
+    <div class="staff-delete-warning">
+        Esta acción eliminará su perfil de personal médico,
+        pero no eliminará su cuenta de usuario.
+    </div>
+
+    <form method="post">
+
+        {% csrf_token %}
+
+        <div class="staff-delete-actions">
+
+            <a
+                href="{% url 'personal_detalle' personal.id %}"
+                class="staff-delete-cancel"
+            >
+                Cancelar
+            </a>
+
+            <button
+                type="submit"
+                class="staff-delete-confirm"
+            >
+                <i class="fa-solid fa-trash"></i>
+                Sí, eliminar
+            </button>
+
+        </div>
+
+    </form>
+
+</section>
+
+{% endblock %}

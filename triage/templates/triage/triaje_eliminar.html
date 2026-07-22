@@ -1,0 +1,100 @@
+{% extends "core/base.html" %}
+
+{% block title %}
+Eliminar triaje
+{% endblock %}
+
+{% block content %}
+
+<style>
+    .delete-container {
+        max-width: 600px;
+        margin: 60px auto;
+    }
+
+    .delete-card {
+        padding: 32px;
+        text-align: center;
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 5px 20px rgba(15, 23, 42, 0.08);
+    }
+
+    .delete-icon {
+        font-size: 50px;
+    }
+
+    .delete-card h1 {
+        color: #1e293b;
+    }
+
+    .delete-card p {
+        color: #64748b;
+        line-height: 1.6;
+    }
+
+    .delete-actions {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        margin-top: 25px;
+    }
+
+    .button {
+        padding: 12px 20px;
+        border-radius: 9px;
+        text-decoration: none;
+        font-weight: 700;
+    }
+
+    .cancel-button {
+        background: #e2e8f0;
+        color: #334155;
+    }
+
+    .delete-button {
+        border: none;
+        background: #dc2626;
+        color: white;
+        cursor: pointer;
+    }
+</style>
+
+<div class="delete-container">
+    <div class="delete-card">
+        <div class="delete-icon">⚠️</div>
+
+        <h1>Eliminar triaje</h1>
+
+        <p>
+            ¿Estás seguro de eliminar el triaje de
+            <strong>
+                {{ triaje.paciente.nombre }}
+                {{ triaje.paciente.apellido }}
+            </strong>?
+        </p>
+
+        <p>
+            Esta acción no se puede deshacer.
+        </p>
+
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="delete-actions">
+                <a
+                    href="{% url 'triaje_detalle' triaje.id %}"
+                    class="button cancel-button"
+                >
+                    Cancelar
+                </a>
+
+                <button type="submit" class="button delete-button">
+                    Sí, eliminar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

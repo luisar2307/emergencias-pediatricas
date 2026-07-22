@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Eliminar paciente</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            min-height: 100vh;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f4f7fb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            color: #1f2937;
+        }
+
+        .delete-card {
+            width: 100%;
+            max-width: 620px;
+            background: #ffffff;
+            border: 1px solid #fee2e2;
+            border-radius: 18px;
+            box-shadow: 0 18px 45px rgba(15, 23, 42, 0.10);
+            overflow: hidden;
+        }
+
+        .delete-header {
+            background: linear-gradient(135deg, #dc2626, #ef4444);
+            color: #ffffff;
+            padding: 28px 32px;
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .delete-icon {
+            width: 58px;
+            height: 58px;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.17);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+        }
+
+        .delete-header h1 {
+            font-size: 24px;
+        }
+
+        .delete-header p {
+            margin-top: 6px;
+            color: rgba(255, 255, 255, 0.82);
+            font-size: 14px;
+        }
+
+        .delete-body {
+            padding: 32px;
+        }
+
+        .warning-box {
+            padding: 18px;
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 12px;
+            color: #991b1b;
+            line-height: 1.6;
+        }
+
+        .patient-name {
+            margin-top: 22px;
+            padding: 18px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+        }
+
+        .patient-name strong {
+            display: block;
+            font-size: 18px;
+            color: #0f172a;
+        }
+
+        .patient-name span {
+            display: block;
+            margin-top: 6px;
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        .delete-actions {
+            margin-top: 28px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        .button {
+            min-width: 145px;
+            border-radius: 9px;
+            padding: 12px 18px;
+            text-align: center;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .cancel-button {
+            background: #ffffff;
+            color: #475569;
+            border: 1px solid #cbd5e1;
+        }
+
+        .delete-button {
+            border: none;
+            background: #dc2626;
+            color: #ffffff;
+        }
+
+        .delete-button:hover {
+            background: #b91c1c;
+        }
+    </style>
+</head>
+
+<body>
+
+<section class="delete-card">
+
+    <div class="delete-header">
+        <div class="delete-icon">⚠</div>
+
+        <div>
+            <h1>Eliminar paciente</h1>
+
+            <p>
+                Esta acción requiere confirmación.
+            </p>
+        </div>
+    </div>
+
+    <div class="delete-body">
+
+        <div class="warning-box">
+            Está a punto de eliminar permanentemente este paciente.
+            Esta acción no se puede deshacer.
+        </div>
+
+        <div class="patient-name">
+            <strong>
+                {{ paciente.nombre }}
+                {{ paciente.apellido }}
+            </strong>
+
+            <span>
+                Historia clínica:
+                {{ paciente.historia_clinica }}
+            </span>
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="delete-actions">
+                <a
+                    href="{% url 'paciente_detalle' paciente.id %}"
+                    class="button cancel-button"
+                >
+                    Cancelar
+                </a>
+
+                <button
+                    type="submit"
+                    class="button delete-button"
+                >
+                    Sí, eliminar
+                </button>
+            </div>
+        </form>
+
+    </div>
+
+</section>
+
+</body>
+</html>
