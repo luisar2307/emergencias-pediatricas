@@ -1,0 +1,1864 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Panel principal | Emergencias Pediátricas</title>
+
+    <style>
+        :root {
+            --primary: #075985;
+            --primary-dark: #0c3b59;
+            --primary-light: #e8f4fb;
+
+            --secondary: #0284c7;
+            --success: #059669;
+            --success-light: #e8f8f2;
+            --warning: #d97706;
+            --warning-light: #fff7e8;
+            --danger: #dc3545;
+            --danger-dark: #b92535;
+            --danger-light: #fff0f2;
+
+            --background: #f3f7fb;
+            --surface: #ffffff;
+            --text: #172033;
+            --text-soft: #667085;
+            --border: #dce6ef;
+
+            --sidebar-width: 280px;
+            --radius: 18px;
+            --shadow: 0 10px 30px rgba(15, 55, 80, 0.08);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            min-height: 100vh;
+            background: var(--background);
+            color: var(--text);
+
+            font-family:
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                Roboto,
+                Arial,
+                sans-serif;
+        }
+
+        a {
+            color: inherit;
+        }
+
+        button,
+        input {
+            font-family: inherit;
+        }
+
+        /* =========================
+           ESTRUCTURA PRINCIPAL
+        ========================== */
+
+        .app-layout {
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+
+            display: flex;
+            flex-direction: column;
+
+            width: var(--sidebar-width);
+            height: 100vh;
+            padding: 22px 18px;
+
+            overflow-y: auto;
+
+            color: white;
+
+            background:
+                radial-gradient(
+                    circle at top right,
+                    rgba(255,255,255,0.12),
+                    transparent 30%
+                ),
+                linear-gradient(
+                    180deg,
+                    #0c4a6e 0%,
+                    #075985 48%,
+                    #063b58 100%
+                );
+
+            box-shadow: 8px 0 30px rgba(7, 45, 68, 0.17);
+
+            transition: transform 0.25s ease;
+        }
+
+        .main-content {
+            width: calc(100% - var(--sidebar-width));
+            min-height: 100vh;
+            margin-left: var(--sidebar-width);
+        }
+
+        /* =========================
+           SIDEBAR
+        ========================== */
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+
+            padding: 6px 5px 22px;
+
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .brand-logo {
+            display: grid;
+
+            width: 53px;
+            min-width: 53px;
+            height: 53px;
+
+            place-items: center;
+
+            border-radius: 15px;
+
+            background: white;
+
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.18);
+        }
+
+        .brand-cross {
+            position: relative;
+
+            width: 28px;
+            height: 28px;
+        }
+
+        .brand-cross::before,
+        .brand-cross::after {
+            position: absolute;
+
+            border-radius: 3px;
+
+            background: var(--danger);
+
+            content: "";
+        }
+
+        .brand-cross::before {
+            top: 0;
+            left: 9px;
+
+            width: 10px;
+            height: 28px;
+        }
+
+        .brand-cross::after {
+            top: 9px;
+            left: 0;
+
+            width: 28px;
+            height: 10px;
+        }
+
+        .brand-text h2 {
+            font-size: 17px;
+            line-height: 1.15;
+        }
+
+        .brand-text p {
+            margin-top: 5px;
+
+            color: #cdeafa;
+
+            font-size: 11px;
+        }
+
+        .user-panel {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+
+            margin: 20px 2px 14px;
+            padding: 15px;
+
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            border-radius: 16px;
+
+            background: rgba(255, 255, 255, 0.09);
+        }
+
+        .user-avatar {
+            display: grid;
+
+            width: 45px;
+            min-width: 45px;
+            height: 45px;
+
+            place-items: center;
+
+            border: 2px solid rgba(255, 255, 255, 0.25);
+            border-radius: 13px;
+
+            background: rgba(255, 255, 255, 0.15);
+
+            font-size: 18px;
+            font-weight: 800;
+        }
+
+        .user-data {
+            min-width: 0;
+        }
+
+        .user-data strong {
+            display: block;
+
+            overflow: hidden;
+
+            font-size: 14px;
+
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .role-badge {
+            display: inline-flex;
+
+            margin-top: 5px;
+            padding: 4px 9px;
+
+            border-radius: 20px;
+
+            background: rgba(255,255,255,0.16);
+            color: #e6f6ff;
+
+            font-size: 9px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+        }
+
+        .menu-label {
+            margin: 17px 9px 9px;
+
+            color: #a9d8ef;
+
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 1.1px;
+            text-transform: uppercase;
+        }
+
+        .navigation {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .navigation-link {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+
+            min-height: 48px;
+            padding: 11px 14px;
+
+            border-radius: 12px;
+
+            color: #e8f6fd;
+
+            font-size: 14px;
+            font-weight: 650;
+            text-decoration: none;
+
+            transition:
+                background 0.2s ease,
+                transform 0.2s ease;
+        }
+
+        .navigation-link:hover,
+        .navigation-link.active {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+
+            transform: translateX(3px);
+        }
+
+        .navigation-icon {
+            display: grid;
+
+            width: 29px;
+            min-width: 29px;
+            height: 29px;
+
+            place-items: center;
+
+            border-radius: 8px;
+
+            background: rgba(255, 255, 255, 0.09);
+
+            font-size: 17px;
+        }
+
+        .sidebar-extra {
+            margin-top: auto;
+            padding-top: 20px;
+        }
+
+        .emergency-info {
+            padding: 15px;
+
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 14px;
+
+            background: rgba(255,255,255,0.08);
+        }
+
+        .emergency-info-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+        .online-dot {
+            width: 8px;
+            height: 8px;
+
+            border-radius: 50%;
+
+            background: #39d99a;
+
+            box-shadow: 0 0 0 5px rgba(57, 217, 154, 0.12);
+        }
+
+        .emergency-info p {
+            margin-top: 9px;
+
+            color: #cce7f4;
+
+            font-size: 10px;
+            line-height: 1.55;
+        }
+
+        .emergency-number {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            margin-top: 12px;
+            padding-top: 11px;
+
+            border-top: 1px solid rgba(255,255,255,0.12);
+        }
+
+        .emergency-number span {
+            color: #b9dced;
+            font-size: 10px;
+        }
+
+        .emergency-number strong {
+            font-size: 13px;
+        }
+
+        .logout-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+
+            width: 100%;
+            min-height: 48px;
+            margin-top: 13px;
+            padding: 12px;
+
+            border-radius: 12px;
+
+            background: var(--danger);
+            color: white;
+
+            font-size: 13px;
+            font-weight: 800;
+            text-decoration: none;
+
+            transition:
+                background 0.2s ease,
+                transform 0.2s ease;
+        }
+
+        .logout-link:hover {
+            background: var(--danger-dark);
+
+            transform: translateY(-1px);
+        }
+
+        /* =========================
+           BARRA SUPERIOR
+        ========================== */
+
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 900;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+
+            min-height: 82px;
+            padding: 15px 32px;
+
+            border-bottom: 1px solid var(--border);
+
+            background: rgba(255, 255, 255, 0.94);
+
+            backdrop-filter: blur(12px);
+        }
+
+        .topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+        }
+
+        .menu-button {
+            display: none;
+
+            width: 43px;
+            height: 43px;
+
+            border: 1px solid var(--border);
+            border-radius: 11px;
+
+            background: white;
+            color: var(--primary);
+
+            cursor: pointer;
+            font-size: 19px;
+        }
+
+        .topbar-title h1 {
+            font-size: 23px;
+        }
+
+        .topbar-title p {
+            margin-top: 4px;
+
+            color: var(--text-soft);
+
+            font-size: 12px;
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+        }
+
+        .date-card {
+            padding: 9px 14px;
+
+            border: 1px solid var(--border);
+            border-radius: 12px;
+
+            background: #f8fafc;
+        }
+
+        .date-card strong,
+        .date-card span {
+            display: block;
+        }
+
+        .date-card strong {
+            font-size: 10px;
+        }
+
+        .date-card span {
+            margin-top: 3px;
+
+            color: var(--text-soft);
+
+            font-size: 10px;
+        }
+
+        .operative-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+
+            padding: 10px 14px;
+
+            border-radius: 22px;
+
+            background: var(--success-light);
+            color: #087458;
+
+            font-size: 10px;
+            font-weight: 850;
+        }
+
+        /* =========================
+           CONTENIDO
+        ========================== */
+
+        .page-content {
+            padding: 28px 32px 40px;
+        }
+
+        .message-container {
+            margin-bottom: 18px;
+        }
+
+        .message-item {
+            padding: 13px 15px;
+
+            border: 1px solid #f2c3c8;
+            border-radius: 11px;
+
+            background: var(--danger-light);
+            color: #a92837;
+
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        /* =========================
+           BIENVENIDA
+        ========================== */
+
+        .welcome-section {
+            display: grid;
+            grid-template-columns:
+                minmax(0, 1.2fr)
+                minmax(330px, 0.8fr);
+            gap: 23px;
+
+            margin-bottom: 22px;
+        }
+
+        .welcome-card {
+            position: relative;
+
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+
+            min-height: 285px;
+            padding: 36px;
+
+            overflow: hidden;
+
+            border-radius: 22px;
+
+            background:
+                radial-gradient(
+                    circle at 88% 20%,
+                    rgba(255,255,255,0.13),
+                    transparent 23%
+                ),
+                linear-gradient(
+                    135deg,
+                    #0d527a 0%,
+                    #0875ad 60%,
+                    #0b8ac7 100%
+                );
+
+            color: white;
+
+            box-shadow:
+                0 18px 40px rgba(7, 89, 133, 0.21);
+        }
+
+        .welcome-card::after {
+            position: absolute;
+            right: -90px;
+            bottom: -100px;
+
+            width: 260px;
+            height: 260px;
+
+            border: 35px solid rgba(255,255,255,0.06);
+            border-radius: 50%;
+
+            content: "";
+        }
+
+        .welcome-label {
+            position: relative;
+            z-index: 2;
+
+            display: inline-flex;
+            align-self: flex-start;
+            align-items: center;
+            gap: 7px;
+
+            margin-bottom: 16px;
+            padding: 7px 12px;
+
+            border: 1px solid rgba(255,255,255,0.25);
+            border-radius: 20px;
+
+            background: rgba(255,255,255,0.1);
+
+            font-size: 10px;
+            font-weight: 850;
+            letter-spacing: 0.6px;
+            text-transform: uppercase;
+        }
+
+        .welcome-card h2 {
+            position: relative;
+            z-index: 2;
+
+            font-size: clamp(28px, 3.1vw, 39px);
+            line-height: 1.15;
+        }
+
+        .welcome-card p {
+            position: relative;
+            z-index: 2;
+
+            max-width: 650px;
+            margin-top: 13px;
+
+            color: #dcf1fc;
+
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        .welcome-details {
+            position: relative;
+            z-index: 2;
+
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+
+            margin-top: 23px;
+        }
+
+        .welcome-detail {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+
+            padding: 10px 13px;
+
+            border: 1px solid rgba(255,255,255,0.18);
+            border-radius: 11px;
+
+            background: rgba(255,255,255,0.11);
+
+            font-size: 11px;
+            font-weight: 750;
+        }
+
+        /* Imagen del hospital */
+
+        .hospital-card {
+            position: relative;
+
+            min-height: 285px;
+
+            overflow: hidden;
+
+            border: 1px solid var(--border);
+            border-radius: 22px;
+
+            background: white;
+
+            box-shadow: var(--shadow);
+        }
+
+        .hospital-image-container {
+            position: absolute;
+            inset: 0;
+
+            overflow: hidden;
+        }
+
+        .hospital-image {
+            display: block;
+
+            width: 100%;
+            height: calc(100% + 65px);
+
+            object-fit: cover;
+            object-position: center bottom;
+
+            transform: translateY(-48px) scale(1.08);
+        }
+
+        .hospital-overlay {
+            position: absolute;
+            inset: 0;
+
+            background:
+                linear-gradient(
+                    180deg,
+                    rgba(5, 30, 48, 0.02) 30%,
+                    rgba(5, 30, 48, 0.86) 100%
+                );
+        }
+
+        .hospital-data {
+            position: absolute;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 2;
+
+            padding: 23px;
+
+            color: white;
+        }
+
+        .hospital-data span {
+            display: block;
+
+            color: #c9e9f8;
+
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 0.7px;
+            text-transform: uppercase;
+        }
+
+        .hospital-data h3 {
+            margin-top: 6px;
+
+            font-size: 19px;
+        }
+
+        .hospital-data p {
+            margin-top: 6px;
+
+            color: #e2f2f9;
+
+            font-size: 11px;
+            line-height: 1.5;
+        }
+
+        /* =========================
+           TARJETAS DE ESTADO
+        ========================== */
+
+        .status-grid {
+            display: grid;
+            grid-template-columns:
+                repeat(3, minmax(0, 1fr));
+            gap: 17px;
+
+            margin-bottom: 23px;
+        }
+
+        .status-card {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+
+            min-height: 107px;
+            padding: 18px;
+
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+
+            background: white;
+
+            box-shadow: var(--shadow);
+        }
+
+        .status-icon {
+            display: grid;
+
+            width: 52px;
+            min-width: 52px;
+            height: 52px;
+
+            place-items: center;
+
+            border-radius: 15px;
+
+            background: var(--primary-light);
+
+            font-size: 24px;
+        }
+
+        .status-card:nth-child(2) .status-icon {
+            background: var(--success-light);
+        }
+
+        .status-card:nth-child(3) .status-icon {
+            background: var(--warning-light);
+        }
+
+        .status-information span {
+            display: block;
+
+            margin-bottom: 5px;
+
+            color: var(--text-soft);
+
+            font-size: 9px;
+            font-weight: 850;
+            letter-spacing: 0.65px;
+            text-transform: uppercase;
+        }
+
+        .status-information strong {
+            display: block;
+
+            font-size: 18px;
+        }
+
+        .status-information small {
+            display: block;
+
+            margin-top: 4px;
+
+            color: var(--text-soft);
+
+            font-size: 10px;
+        }
+
+        /* =========================
+           CONTENIDO INFERIOR
+        ========================== */
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns:
+                minmax(0, 1.25fr)
+                minmax(300px, 0.75fr);
+            gap: 18px;
+        }
+
+        .panel {
+            padding: 22px;
+
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+
+            background: white;
+
+            box-shadow: var(--shadow);
+        }
+
+        .panel-heading {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 15px;
+
+            margin-bottom: 18px;
+        }
+
+        .panel-heading h3 {
+            font-size: 17px;
+        }
+
+        .panel-heading p {
+            margin-top: 5px;
+
+            color: var(--text-soft);
+
+            font-size: 11px;
+        }
+
+        .panel-badge {
+            padding: 6px 10px;
+
+            border-radius: 20px;
+
+            background: var(--primary-light);
+            color: var(--primary);
+
+            font-size: 9px;
+            font-weight: 850;
+            white-space: nowrap;
+        }
+
+        .protocol-list {
+            display: grid;
+            gap: 11px;
+        }
+
+        .protocol-item {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+
+            padding: 14px;
+
+            border: 1px solid #e8eef4;
+            border-radius: 13px;
+
+            background: #f9fbfd;
+        }
+
+        .protocol-number {
+            display: grid;
+
+            width: 39px;
+            min-width: 39px;
+            height: 39px;
+
+            place-items: center;
+
+            border-radius: 11px;
+
+            background: var(--primary);
+            color: white;
+
+            font-size: 12px;
+            font-weight: 850;
+        }
+
+        .protocol-item:nth-child(2) .protocol-number {
+            background: var(--success);
+        }
+
+        .protocol-item:nth-child(3) .protocol-number {
+            background: var(--warning);
+        }
+
+        .protocol-item:nth-child(4) .protocol-number {
+            background: var(--danger);
+        }
+
+        .protocol-text strong {
+            display: block;
+
+            font-size: 12px;
+        }
+
+        .protocol-text p {
+            margin-top: 4px;
+
+            color: var(--text-soft);
+
+            font-size: 10px;
+            line-height: 1.45;
+        }
+
+        .information-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .security-box {
+            position: relative;
+
+            padding: 23px;
+
+            overflow: hidden;
+
+            border-radius: var(--radius);
+
+            background:
+                linear-gradient(
+                    145deg,
+                    #12283a 0%,
+                    #174d6c 100%
+                );
+
+            color: white;
+
+            box-shadow:
+                0 15px 32px rgba(18, 40, 58, 0.17);
+        }
+
+        .security-box::after {
+            position: absolute;
+            top: -60px;
+            right: -60px;
+
+            width: 160px;
+            height: 160px;
+
+            border: 25px solid rgba(255,255,255,0.05);
+            border-radius: 50%;
+
+            content: "";
+        }
+
+        .security-icon {
+            position: relative;
+            z-index: 2;
+
+            display: grid;
+
+            width: 53px;
+            height: 53px;
+
+            place-items: center;
+
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 14px;
+
+            background: rgba(255,255,255,0.08);
+
+            font-size: 25px;
+        }
+
+        .security-box h3 {
+            position: relative;
+            z-index: 2;
+
+            margin-top: 19px;
+
+            font-size: 17px;
+        }
+
+        .security-box p {
+            position: relative;
+            z-index: 2;
+
+            margin-top: 8px;
+
+            color: #cadce7;
+
+            font-size: 11px;
+            line-height: 1.65;
+        }
+
+        .security-session {
+            position: relative;
+            z-index: 2;
+
+            margin-top: 18px;
+            padding-top: 14px;
+
+            border-top: 1px solid rgba(255,255,255,0.12);
+        }
+
+        .security-session span {
+            display: block;
+
+            color: #99b6c7;
+
+            font-size: 9px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .security-session strong {
+            display: block;
+
+            margin-top: 5px;
+
+            font-size: 12px;
+        }
+
+        .support-box {
+            padding: 20px;
+
+            border: 1px solid #d8e7f0;
+            border-radius: var(--radius);
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #f0f9ff,
+                    #ffffff
+                );
+
+            box-shadow: var(--shadow);
+        }
+
+        .support-header {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+        }
+
+        .support-icon {
+            display: grid;
+
+            width: 42px;
+            min-width: 42px;
+            height: 42px;
+
+            place-items: center;
+
+            border-radius: 12px;
+
+            background: var(--primary-light);
+
+            font-size: 20px;
+        }
+
+        .support-header h3 {
+            font-size: 14px;
+        }
+
+        .support-header p {
+            margin-top: 3px;
+
+            color: var(--text-soft);
+
+            font-size: 10px;
+        }
+
+        .support-message {
+            margin-top: 14px;
+            padding-top: 13px;
+
+            border-top: 1px solid #deebf2;
+
+            color: var(--text-soft);
+
+            font-size: 10px;
+            line-height: 1.55;
+        }
+
+        .footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 18px;
+
+            margin-top: 22px;
+            padding: 17px 4px 0;
+
+            border-top: 1px solid var(--border);
+
+            color: var(--text-soft);
+
+            font-size: 10px;
+        }
+
+        /* =========================
+           MÓVIL
+        ========================== */
+
+        .sidebar-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 950;
+
+            display: none;
+
+            background: rgba(15, 30, 42, 0.6);
+        }
+
+        @media (max-width: 1100px) {
+            .welcome-section {
+                grid-template-columns: 1fr;
+            }
+
+            .hospital-card {
+                min-height: 300px;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .sidebar-overlay.active {
+                display: block;
+            }
+
+            .main-content {
+                width: 100%;
+                margin-left: 0;
+            }
+
+            .menu-button {
+                display: grid;
+                place-items: center;
+            }
+        }
+
+        @media (max-width: 730px) {
+            .topbar {
+                padding: 14px 17px;
+            }
+
+            .topbar-title h1 {
+                font-size: 18px;
+            }
+
+            .topbar-title p,
+            .date-card {
+                display: none;
+            }
+
+            .page-content {
+                padding: 20px 17px 30px;
+            }
+
+            .welcome-card {
+                min-height: auto;
+                padding: 27px 24px;
+            }
+
+            .welcome-card h2 {
+                font-size: 27px;
+            }
+
+            .hospital-card {
+                min-height: 250px;
+            }
+
+            .status-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .footer {
+                align-items: flex-start;
+                flex-direction: column;
+                gap: 6px;
+            }
+        }
+
+        @media (max-width: 450px) {
+            .operative-badge {
+                display: none;
+            }
+
+            .welcome-details {
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+            .welcome-detail {
+                width: 100%;
+            }
+
+            .panel-heading {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div
+    class="sidebar-overlay"
+    id="sidebarOverlay"
+></div>
+
+<div class="app-layout">
+
+    <!-- SIDEBAR -->
+
+    <aside
+        class="sidebar"
+        id="sidebar"
+    >
+
+        <div class="brand">
+
+            <div class="brand-logo">
+                <div class="brand-cross"></div>
+            </div>
+
+            <div class="brand-text">
+                <h2>
+                    Emergencias<br>
+                    Pediátricas
+                </h2>
+
+                <p>
+                    Gestión hospitalaria
+                </p>
+            </div>
+
+        </div>
+
+        <div class="user-panel">
+
+            <div class="user-avatar">
+                {{ usuario.username|first|upper }}
+            </div>
+
+            <div class="user-data">
+
+                <strong>
+                    {{ usuario.get_full_name|default:usuario.username }}
+                </strong>
+
+                <span class="role-badge">
+                    {{ rol|default:"SIN ROL" }}
+                </span>
+
+            </div>
+
+        </div>
+
+        <div class="menu-label">
+            Menú principal
+        </div>
+
+        <nav class="navigation">
+
+            <a
+                href="{% url 'home' %}"
+                class="navigation-link active"
+            >
+                <span class="navigation-icon">⌂</span>
+                <span>Inicio</span>
+            </a>
+
+            {% if permisos.pacientes %}
+                <a
+                    href="{% url 'pacientes' %}"
+                    class="navigation-link"
+                >
+                    <span class="navigation-icon">👶</span>
+                    <span>Pacientes</span>
+                </a>
+            {% endif %}
+
+            {% if permisos.triaje %}
+                <a
+                    href="{% url 'triaje' %}"
+                    class="navigation-link"
+                >
+                    <span class="navigation-icon">🩺</span>
+                    <span>Triaje</span>
+                </a>
+            {% endif %}
+
+
+
+
+
+            {% if permisos.medicos %}
+                <a
+                    href="{% url 'medicos' %}"
+                    class="navigation-link"
+                >
+                    <span class="navigation-icon">⚕️</span>
+                    <span>Médicos</span>
+                </a>
+            {% endif %}
+
+            {% if permisos.usuarios %}
+                <a
+                    href="{% url 'usuarios' %}"
+                    class="navigation-link"
+                >
+                    <span class="navigation-icon">👥</span>
+                    <span>Usuarios</span>
+                </a>
+            {% endif %}
+
+        </nav>
+
+        <div class="sidebar-extra">
+
+            <div class="emergency-info">
+
+                <div class="emergency-info-title">
+                    <span class="online-dot"></span>
+                    Sistema disponible
+                </div>
+
+                <p>
+                    Plataforma activa y protegida mediante
+                    autenticación y control de roles.
+                </p>
+
+                <div class="emergency-number">
+                    <span>Emergencias</span>
+                    <strong>ECU 911</strong>
+                </div>
+
+            </div>
+
+            <a
+                href="{% url 'logout' %}"
+                class="logout-link"
+            >
+                <span>↪</span>
+                Cerrar sesión
+            </a>
+
+        </div>
+
+    </aside>
+
+    <!-- CONTENIDO PRINCIPAL -->
+
+    <main class="main-content">
+
+        <header class="topbar">
+
+            <div class="topbar-left">
+
+                <button
+                    type="button"
+                    class="menu-button"
+                    id="menuButton"
+                    aria-label="Abrir menú"
+                >
+                    ☰
+                </button>
+
+                <div class="topbar-title">
+                    <h1>Panel principal</h1>
+
+                    <p>
+                        Sistema de atención de emergencias pediátricas
+                    </p>
+                </div>
+
+            </div>
+
+            <div class="topbar-right">
+
+                <div class="date-card">
+                    <strong>Fecha actual</strong>
+
+                    <span id="currentDate">
+                        Cargando...
+                    </span>
+                </div>
+
+                <div class="operative-badge">
+                    <span class="online-dot"></span>
+                    Operativo
+                </div>
+
+            </div>
+
+        </header>
+
+        <section class="page-content">
+
+            {% if messages %}
+                <div class="message-container">
+
+                    {% for message in messages %}
+                        <div class="message-item">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+
+                </div>
+            {% endif %}
+
+            <!-- BIENVENIDA -->
+
+            <section class="welcome-section">
+
+                <article class="welcome-card">
+
+                    <span class="welcome-label">
+                        🏥 Sistema hospitalario pediátrico
+                    </span>
+
+                    <h2>
+                        Bienvenido,
+                        {{ usuario.first_name|default:usuario.username }}
+                    </h2>
+
+                    <p>
+                        Desde este panel puedes supervisar tu sesión
+                        y acceder desde el menú lateral a los módulos
+                        autorizados para el rol
+                        <strong>{{ rol|default:"SIN ROL" }}</strong>.
+                    </p>
+
+                    <div class="welcome-details">
+
+                        <div class="welcome-detail">
+                            🛡️ Acceso protegido
+                        </div>
+
+                        <div class="welcome-detail">
+                            👤 Usuario verificado
+                        </div>
+
+                        <div class="welcome-detail">
+                            ⚕️ Atención pediátrica
+                        </div>
+
+                    </div>
+
+                </article>
+
+                <article class="hospital-card">
+
+                    <div class="hospital-image-container">
+
+                        <img
+                            src="{% static 'core/img/inicio_dashboard.png' %}"
+                            alt="Hospital de emergencias pediátricas"
+                            class="hospital-image"
+                        >
+
+                    </div>
+
+                    <div class="hospital-overlay"></div>
+
+                    <div class="hospital-data">
+                        <span>Centro pediátrico</span>
+
+                        <h3>
+                            Atención integral y segura
+                        </h3>
+
+                        <p>
+                            Gestión centralizada de pacientes,
+                            triaje, emergencias e historias clínicas.
+                        </p>
+                    </div>
+
+                </article>
+
+            </section>
+
+            <!-- ESTADO DE LA SESIÓN -->
+
+            <section class="status-grid">
+
+                <article class="status-card">
+
+                    <div class="status-icon">
+                        👤
+                    </div>
+
+                    <div class="status-information">
+                        <span>Usuario autenticado</span>
+
+                        <strong>
+                            {{ usuario.get_full_name|default:usuario.username }}
+                        </strong>
+
+                        <small>
+                            Sesión iniciada correctamente
+                        </small>
+                    </div>
+
+                </article>
+
+                <article class="status-card">
+
+                    <div class="status-icon">
+                        🛡️
+                    </div>
+
+                    <div class="status-information">
+                        <span>Rol asignado</span>
+
+                        <strong>
+                            {{ rol|default:"Sin rol" }}
+                        </strong>
+
+                        <small>
+                            Permisos según el perfil
+                        </small>
+                    </div>
+
+                </article>
+
+                <article class="status-card">
+
+                    <div class="status-icon">
+                        🔐
+                    </div>
+
+                    <div class="status-information">
+                        <span>Seguridad</span>
+
+                        <strong>Activa</strong>
+
+                        <small>
+                            Control de acceso habilitado
+                        </small>
+                    </div>
+
+                </article>
+
+            </section>
+
+            <!-- INFORMACIÓN GENERAL -->
+
+            <section class="dashboard-grid">
+
+                <article class="panel">
+
+                    <div class="panel-heading">
+
+                        <div>
+                            <h3>
+                                Protocolo general de atención
+                            </h3>
+
+                            <p>
+                                Flujo recomendado para la atención
+                                de pacientes pediátricos.
+                            </p>
+                        </div>
+
+                        <span class="panel-badge">
+                            Proceso clínico
+                        </span>
+
+                    </div>
+
+                    <div class="protocol-list">
+
+                        <div class="protocol-item">
+
+                            <span class="protocol-number">
+                                01
+                            </span>
+
+                            <div class="protocol-text">
+                                <strong>
+                                    Registro del paciente
+                                </strong>
+
+                                <p>
+                                    Verificación de información personal,
+                                    representante y datos de contacto.
+                                </p>
+                            </div>
+
+                        </div>
+
+                        <div class="protocol-item">
+
+                            <span class="protocol-number">
+                                02
+                            </span>
+
+                            <div class="protocol-text">
+                                <strong>
+                                    Evaluación de triaje
+                                </strong>
+
+                                <p>
+                                    Registro de signos vitales y
+                                    clasificación de prioridad clínica.
+                                </p>
+                            </div>
+
+                        </div>
+
+                        <div class="protocol-item">
+
+                            <span class="protocol-number">
+                                03
+                            </span>
+
+                            <div class="protocol-text">
+                                <strong>
+                                    Atención médica
+                                </strong>
+
+                                <p>
+                                    Valoración profesional, diagnóstico
+                                    y definición del tratamiento.
+                                </p>
+                            </div>
+
+                        </div>
+
+                        <div class="protocol-item">
+
+                            <span class="protocol-number">
+                                04
+                            </span>
+
+                            <div class="protocol-text">
+                                <strong>
+                                    Seguimiento clínico
+                                </strong>
+
+                                <p>
+                                    Actualización de la historia clínica
+                                    y seguimiento de la emergencia.
+                                </p>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </article>
+
+                <div class="information-panel">
+
+                    <article class="security-box">
+
+                        <div class="security-icon">
+                            🛡️
+                        </div>
+
+                        <h3>
+                            Sesión protegida
+                        </h3>
+
+                        <p>
+                            El sistema controla el acceso a cada módulo
+                            según el rol asignado al usuario. No compartas
+                            tus credenciales de acceso.
+                        </p>
+
+                        <div class="security-session">
+                            <span>Sesión actual</span>
+
+                            <strong>
+                                {{ usuario.username }} · {{ rol }}
+                            </strong>
+                        </div>
+
+                    </article>
+
+                    <article class="support-box">
+
+                        <div class="support-header">
+
+                            <div class="support-icon">
+                                ℹ️
+                            </div>
+
+                            <div>
+                                <h3>
+                                    Información del sistema
+                                </h3>
+
+                                <p>
+                                    Plataforma de gestión hospitalaria
+                                </p>
+                            </div>
+
+                        </div>
+
+                        <p class="support-message">
+                            Para ingresar a Pacientes, Triaje,
+                            Emergencias, Historias clínicas, Médicos
+                            o Usuarios utiliza exclusivamente el menú
+                            ubicado en el lado izquierdo.
+                        </p>
+
+                    </article>
+
+                </div>
+
+            </section>
+
+            <footer class="footer">
+
+                <span>
+                    Emergencias Pediátricas · Sistema de gestión hospitalaria
+                </span>
+
+                <span>
+                    Acceso seguro por roles
+                </span>
+
+            </footer>
+
+        </section>
+
+    </main>
+
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const sidebar =
+            document.getElementById("sidebar");
+
+        const overlay =
+            document.getElementById("sidebarOverlay");
+
+        const menuButton =
+            document.getElementById("menuButton");
+
+        const currentDate =
+            document.getElementById("currentDate");
+
+        function openSidebar() {
+            sidebar.classList.add("open");
+            overlay.classList.add("active");
+        }
+
+        function closeSidebar() {
+            sidebar.classList.remove("open");
+            overlay.classList.remove("active");
+        }
+
+        if (menuButton) {
+            menuButton.addEventListener("click", function () {
+                if (sidebar.classList.contains("open")) {
+                    closeSidebar();
+                } else {
+                    openSidebar();
+                }
+            });
+        }
+
+        if (overlay) {
+            overlay.addEventListener("click", closeSidebar);
+        }
+
+        window.addEventListener("resize", function () {
+            if (window.innerWidth > 900) {
+                closeSidebar();
+            }
+        });
+
+        if (currentDate) {
+            const today = new Date();
+
+            currentDate.textContent =
+                today.toLocaleDateString(
+                    "es-EC",
+                    {
+                        day: "2-digit",
+                        month: "long",
+                        year: "numeric"
+                    }
+                );
+        }
+    });
+</script>
+
+</body>
+</html>

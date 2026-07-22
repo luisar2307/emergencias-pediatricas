@@ -1,0 +1,545 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="Sistema moderno de gestión pediátrica"
+    >
+
+    <title>
+        {% block title %}
+            Gestión Pediátrica
+        {% endblock %}
+    </title>
+
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet"
+    >
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="{% static 'core/css/style.css' %}"
+    >
+
+    {% block extra_css %}
+    {% endblock %}
+</head>
+
+<body>
+
+<div class="app-layout">
+
+    <div
+        class="sidebar-overlay"
+        id="sidebarOverlay"
+    ></div>
+
+    <aside
+        class="sidebar"
+        id="sidebar"
+    >
+
+        <div class="sidebar-decoration sidebar-decoration-one"></div>
+        <div class="sidebar-decoration sidebar-decoration-two"></div>
+
+        <div class="sidebar-brand">
+
+            <a
+                href="{% url 'home' %}"
+                class="brand-link"
+            >
+
+                <div class="brand-icon">
+                    <i class="fa-solid fa-heart-pulse"></i>
+                </div>
+
+                <div class="brand-text">
+
+                    <span class="brand-title">
+                        Gestión
+                    </span>
+
+                    <span class="brand-subtitle">
+                        Pediátrica
+                    </span>
+
+                </div>
+
+            </a>
+
+            <button
+                type="button"
+                class="sidebar-close"
+                id="sidebarClose"
+                aria-label="Cerrar menú"
+            >
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+        </div>
+
+        <div class="sidebar-hospital-card">
+
+            <div class="sidebar-hospital-icon">
+                <i class="fa-solid fa-hospital"></i>
+            </div>
+
+            <div>
+                <span class="sidebar-hospital-label">
+                    Centro médico
+                </span>
+
+                <strong>
+                    Hospital Pediátrico
+                </strong>
+            </div>
+
+        </div>
+
+        <div class="sidebar-user">
+
+            <div class="user-avatar">
+
+                {% if usuario.first_name %}
+                    {{ usuario.first_name|first|upper }}
+                {% else %}
+                    {{ usuario.username|first|upper }}
+                {% endif %}
+
+                <span class="user-online-indicator"></span>
+
+            </div>
+
+            <div class="user-information">
+
+                <p class="user-name">
+
+                    {% if usuario.get_full_name %}
+                        {{ usuario.get_full_name }}
+                    {% else %}
+                        {{ usuario.username }}
+                    {% endif %}
+
+                </p>
+
+                <span class="user-role">
+                    {{ rol|default:"USUARIO" }}
+                </span>
+
+            </div>
+
+        </div>
+
+        <nav class="sidebar-navigation">
+
+            <p class="navigation-title">
+                Navegación
+            </p>
+
+            <ul class="navigation-list">
+
+                <li class="navigation-item">
+
+                    <a
+                        href="{% url 'home' %}"
+                        class="navigation-link
+                        {% if request.resolver_match.url_name == 'home' %}
+                            active
+                        {% endif %}"
+                    >
+
+                        <span class="navigation-icon">
+                            <i class="fa-solid fa-house"></i>
+                        </span>
+
+                        <span class="navigation-text">
+                            Inicio
+                        </span>
+
+                        <span class="navigation-arrow">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </span>
+
+                    </a>
+
+                </li>
+
+                {% if permisos.pacientes %}
+
+                    <li class="navigation-item">
+
+                        <a
+                            href="{% url 'pacientes' %}"
+                            class="navigation-link
+                            {% if request.resolver_match.url_name == 'pacientes' or request.resolver_match.url_name == 'paciente_crear' or request.resolver_match.url_name == 'paciente_detalle' or request.resolver_match.url_name == 'paciente_editar' or request.resolver_match.url_name == 'paciente_eliminar' %}
+                                active
+                            {% endif %}"
+                        >
+
+                            <span class="navigation-icon">
+                                <i class="fa-solid fa-children"></i>
+                            </span>
+
+                            <span class="navigation-text">
+                                Pacientes
+                            </span>
+
+                            <span class="navigation-arrow">
+                                <i class="fa-solid fa-chevron-right"></i>
+                            </span>
+
+                        </a>
+
+                    </li>
+
+                {% endif %}
+
+                {% if permisos.triaje %}
+
+                    <li class="navigation-item">
+
+                        <a
+                            href="{% url 'triaje' %}"
+                            class="navigation-link
+                            {% if request.resolver_match.url_name == 'triaje' or request.resolver_match.url_name == 'triaje_crear' or request.resolver_match.url_name == 'triaje_detalle' or request.resolver_match.url_name == 'triaje_editar' or request.resolver_match.url_name == 'triaje_eliminar' %}
+                                active
+                            {% endif %}"
+                        >
+
+                            <span class="navigation-icon">
+                                <i class="fa-solid fa-stethoscope"></i>
+                            </span>
+
+                            <span class="navigation-text">
+                                Triaje
+                            </span>
+
+                            <span class="navigation-arrow">
+                                <i class="fa-solid fa-chevron-right"></i>
+                            </span>
+
+                        </a>
+
+                    </li>
+
+                {% endif %}
+
+                {% if permisos.medicos %}
+
+                    <li class="navigation-item">
+
+                        <a
+                            href="{% url 'medicos' %}"
+                            class="navigation-link
+                            {% if request.resolver_match.url_name == 'medicos' or request.resolver_match.url_name == 'personal_crear' or request.resolver_match.url_name == 'personal_detalle' or request.resolver_match.url_name == 'personal_editar' or request.resolver_match.url_name == 'personal_eliminar' %}
+                                active
+                            {% endif %}"
+                        >
+
+                            <span class="navigation-icon">
+                                <i class="fa-solid fa-user-doctor"></i>
+                            </span>
+
+                            <span class="navigation-text">
+                                Personal médico
+                            </span>
+
+                            <span class="navigation-arrow">
+                                <i class="fa-solid fa-chevron-right"></i>
+                            </span>
+
+                        </a>
+
+                    </li>
+
+                {% endif %}
+
+                {% if permisos.usuarios %}
+
+                    <li class="navigation-item">
+
+                        <a
+                            href="{% url 'usuarios' %}"
+                            class="navigation-link
+                            {% if request.resolver_match.url_name == 'usuarios' %}
+                                active
+                            {% endif %}"
+                        >
+
+                            <span class="navigation-icon">
+                                <i class="fa-solid fa-users-gear"></i>
+                            </span>
+
+                            <span class="navigation-text">
+                                Usuarios
+                            </span>
+
+                            <span class="navigation-arrow">
+                                <i class="fa-solid fa-chevron-right"></i>
+                            </span>
+
+                        </a>
+
+                    </li>
+
+                {% endif %}
+
+            </ul>
+
+        </nav>
+
+        <div class="system-status-card">
+
+            <div class="system-status-icon">
+                <i class="fa-solid fa-shield-heart"></i>
+            </div>
+
+            <div class="system-status-information">
+
+                <p class="system-status-title">
+                    Sistema protegido
+                </p>
+
+                <span class="system-status-description">
+                    Todos los servicios están activos
+                </span>
+
+            </div>
+
+            <span class="system-status-indicator"></span>
+
+        </div>
+
+        <div class="sidebar-footer">
+
+            <a
+                href="{% url 'logout' %}"
+                class="logout-button"
+            >
+
+                <span class="logout-icon">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                </span>
+
+                <span>
+                    Cerrar sesión
+                </span>
+
+            </a>
+
+        </div>
+
+    </aside>
+
+    <div class="main-wrapper">
+
+        <header class="topbar">
+
+            <div class="topbar-left">
+
+                <button
+                    type="button"
+                    class="menu-button"
+                    id="menuButton"
+                    aria-label="Abrir menú"
+                >
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+
+                <div class="page-heading">
+
+                    <p class="page-eyebrow">
+                        <span></span>
+                        Hospital Pediátrico
+                    </p>
+
+                    <h1 class="page-title">
+                        {% block page_title %}
+                            Panel principal
+                        {% endblock %}
+                    </h1>
+
+                </div>
+
+            </div>
+
+            <div class="topbar-right">
+
+                <div class="current-date">
+
+                    <div class="current-date-icon">
+                        <i class="fa-regular fa-calendar-check"></i>
+                    </div>
+
+                    <div>
+
+                        <span class="current-date-label">
+                            Fecha actual
+                        </span>
+
+                        <p
+                            class="current-date-value"
+                            id="currentDate"
+                        >
+                            Cargando...
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <button
+                    type="button"
+                    class="topbar-action-button"
+                    aria-label="Notificaciones"
+                >
+
+                    <i class="fa-regular fa-bell"></i>
+
+                    <span class="notification-dot"></span>
+
+                </button>
+
+                <div class="topbar-user">
+
+                    <div class="topbar-user-avatar">
+
+                        {% if usuario.first_name %}
+                            {{ usuario.first_name|first|upper }}
+                        {% else %}
+                            {{ usuario.username|first|upper }}
+                        {% endif %}
+
+                    </div>
+
+                    <div class="topbar-user-information">
+
+                        <span class="topbar-user-name">
+
+                            {% if usuario.first_name %}
+                                {{ usuario.first_name }}
+                            {% else %}
+                                {{ usuario.username }}
+                            {% endif %}
+
+                        </span>
+
+                        <span class="topbar-user-role">
+                            {{ rol|default:"USUARIO" }}
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </header>
+
+        {% if messages %}
+
+            <div class="messages-container">
+
+                {% for message in messages %}
+
+                    <div
+                        class="alert-message
+                        {% if message.tags %}
+                            alert-{{ message.tags }}
+                        {% endif %}"
+                    >
+
+                        <div class="alert-message-icon">
+
+                            {% if message.tags == "success" %}
+                                <i class="fa-solid fa-circle-check"></i>
+
+                            {% elif message.tags == "error" %}
+                                <i class="fa-solid fa-circle-exclamation"></i>
+
+                            {% elif message.tags == "warning" %}
+                                <i class="fa-solid fa-triangle-exclamation"></i>
+
+                            {% else %}
+                                <i class="fa-solid fa-circle-info"></i>
+                            {% endif %}
+
+                        </div>
+
+                        <span>
+                            {{ message }}
+                        </span>
+
+                        <button
+                            type="button"
+                            class="alert-close-button"
+                            aria-label="Cerrar mensaje"
+                        >
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        {% endif %}
+
+        <main class="main-content">
+
+            {% block content %}
+            {% endblock %}
+
+        </main>
+
+        <footer class="main-footer">
+
+            <p>
+                © {% now "Y" %} Sistema de Gestión Pediátrica
+            </p>
+
+            <span>
+                <i class="fa-solid fa-heart"></i>
+                Atención segura, rápida y humana
+            </span>
+
+        </footer>
+
+    </div>
+
+</div>
+
+<script src="{% static 'core/js/app.js' %}"></script>
+
+{% block extra_js %}
+{% endblock %}
+
+</body>
+</html>

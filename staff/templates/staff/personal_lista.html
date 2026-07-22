@@ -1,0 +1,605 @@
+{% extends "core/base.html" %}
+
+{% block title %}
+    Personal médico
+{% endblock %}
+
+{% block page_title %}
+    Personal médico
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .staff-hero {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
+        padding: 30px;
+        margin-bottom: 24px;
+        border-radius: 24px;
+        color: white;
+        background:
+            linear-gradient(
+                135deg,
+                #2563eb,
+                #0ea5e9
+            );
+        overflow: hidden;
+    }
+
+    .staff-hero-content {
+        max-width: 620px;
+    }
+
+    .staff-hero h2 {
+        margin: 0 0 8px;
+        font-size: 30px;
+    }
+
+    .staff-hero p {
+        margin: 0;
+        opacity: 0.9;
+    }
+
+    .staff-hero-icon {
+        display: grid;
+        place-items: center;
+        width: 130px;
+        height: 130px;
+        border-radius: 50%;
+        font-size: 66px;
+        background: rgba(255, 255, 255, 0.16);
+    }
+
+    .staff-actions {
+        margin-top: 22px;
+    }
+
+    .staff-primary-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+        padding: 12px 18px;
+        border-radius: 12px;
+        color: #1d4ed8;
+        font-weight: 800;
+        text-decoration: none;
+        background: white;
+    }
+
+    .staff-statistics {
+        display: grid;
+        grid-template-columns:
+            repeat(4, minmax(0, 1fr));
+        gap: 18px;
+        margin-bottom: 24px;
+    }
+
+    .staff-stat-card {
+        padding: 22px;
+        border: 1px solid #e5e7eb;
+        border-radius: 18px;
+        background: white;
+        box-shadow: 0 8px 30px rgba(15, 23, 42, 0.05);
+    }
+
+    .staff-stat-card i {
+        margin-bottom: 14px;
+        font-size: 25px;
+        color: #2563eb;
+    }
+
+    .staff-stat-value {
+        display: block;
+        margin-bottom: 3px;
+        font-size: 28px;
+        font-weight: 800;
+        color: #0f172a;
+    }
+
+    .staff-stat-label {
+        color: #64748b;
+        font-size: 14px;
+    }
+
+    .staff-panel {
+        padding: 24px;
+        border: 1px solid #e5e7eb;
+        border-radius: 20px;
+        background: white;
+    }
+
+    .staff-filters {
+        display: grid;
+        grid-template-columns: 1fr 220px auto;
+        gap: 12px;
+        margin-bottom: 22px;
+    }
+
+    .staff-input,
+    .staff-select {
+        width: 100%;
+        padding: 12px 14px;
+        border: 1px solid #cbd5e1;
+        border-radius: 12px;
+        font-family: inherit;
+        outline: none;
+    }
+
+    .staff-filter-button {
+        padding: 12px 18px;
+        border: 0;
+        border-radius: 12px;
+        color: white;
+        font-weight: 700;
+        cursor: pointer;
+        background: #2563eb;
+    }
+
+    .staff-table-wrapper {
+        overflow-x: auto;
+    }
+
+    .staff-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .staff-table th,
+    .staff-table td {
+        padding: 15px;
+        border-bottom: 1px solid #e5e7eb;
+        text-align: left;
+        white-space: nowrap;
+    }
+
+    .staff-table th {
+        color: #475569;
+        font-size: 13px;
+        text-transform: uppercase;
+    }
+
+    .staff-person {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .staff-avatar {
+        display: grid;
+        place-items: center;
+        width: 43px;
+        height: 43px;
+        border-radius: 50%;
+        color: white;
+        font-weight: 800;
+        background: #2563eb;
+    }
+
+    .staff-name {
+        display: block;
+        color: #0f172a;
+        font-weight: 800;
+    }
+
+    .staff-email {
+        color: #64748b;
+        font-size: 13px;
+    }
+
+    .staff-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 7px 11px;
+        border-radius: 999px;
+        font-size: 13px;
+        font-weight: 800;
+    }
+
+    .staff-status-active {
+        color: #047857;
+        background: #d1fae5;
+    }
+
+    .staff-status-inactive {
+        color: #64748b;
+        background: #f1f5f9;
+    }
+
+    .staff-table-actions {
+        display: flex;
+        gap: 8px;
+    }
+
+    .staff-action {
+        display: grid;
+        place-items: center;
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        color: #334155;
+        text-decoration: none;
+        background: #f1f5f9;
+    }
+
+    .staff-action-danger {
+        color: #dc2626;
+        background: #fee2e2;
+    }
+
+    .staff-empty {
+        padding: 55px 20px;
+        text-align: center;
+        color: #64748b;
+    }
+
+    .staff-empty i {
+        margin-bottom: 14px;
+        font-size: 46px;
+        color: #94a3b8;
+    }
+
+    .staff-pagination {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 12px;
+        margin-top: 24px;
+    }
+
+    .staff-pagination a {
+        padding: 9px 14px;
+        border-radius: 10px;
+        color: #2563eb;
+        text-decoration: none;
+        background: #eff6ff;
+    }
+
+    @media (max-width: 900px) {
+        .staff-statistics {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .staff-filters {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 560px) {
+        .staff-statistics {
+            grid-template-columns: 1fr;
+        }
+
+        .staff-hero-icon {
+            display: none;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<section class="staff-hero">
+
+    <div class="staff-hero-content">
+
+        <h2>
+            Equipo médico pediátrico
+        </h2>
+
+        <p>
+            Administra médicos, especialistas,
+            registros profesionales y turnos activos.
+        </p>
+
+        <div class="staff-actions">
+
+            <a
+                href="{% url 'personal_crear' %}"
+                class="staff-primary-button"
+            >
+                <i class="fa-solid fa-user-doctor"></i>
+                Registrar personal
+            </a>
+
+        </div>
+
+    </div>
+
+    <div class="staff-hero-icon">
+        <i class="fa-solid fa-user-doctor"></i>
+    </div>
+
+</section>
+
+<section class="staff-statistics">
+
+    <article class="staff-stat-card">
+        <i class="fa-solid fa-users"></i>
+
+        <span class="staff-stat-value">
+            {{ total_personal }}
+        </span>
+
+        <span class="staff-stat-label">
+            Personal registrado
+        </span>
+    </article>
+
+    <article class="staff-stat-card">
+        <i class="fa-solid fa-user-clock"></i>
+
+        <span class="staff-stat-value">
+            {{ total_en_turno }}
+        </span>
+
+        <span class="staff-stat-label">
+            En turno
+        </span>
+    </article>
+
+    <article class="staff-stat-card">
+        <i class="fa-solid fa-bed"></i>
+
+        <span class="staff-stat-value">
+            {{ total_fuera_turno }}
+        </span>
+
+        <span class="staff-stat-label">
+            Fuera de turno
+        </span>
+    </article>
+
+    <article class="staff-stat-card">
+        <i class="fa-solid fa-stethoscope"></i>
+
+        <span class="staff-stat-value">
+            {{ total_especialidades }}
+        </span>
+
+        <span class="staff-stat-label">
+            Especialidades
+        </span>
+    </article>
+
+</section>
+
+<section class="staff-panel">
+
+    <form
+        method="get"
+        class="staff-filters"
+    >
+
+        <input
+            type="search"
+            name="buscar"
+            value="{{ busqueda }}"
+            class="staff-input"
+            placeholder="Buscar por nombre, especialidad o registro..."
+        >
+
+        <select
+            name="turno"
+            class="staff-select"
+        >
+            <option value="">
+                Todos los turnos
+            </option>
+
+            <option
+                value="activo"
+                {% if estado_turno == "activo" %}
+                    selected
+                {% endif %}
+            >
+                En turno
+            </option>
+
+            <option
+                value="inactivo"
+                {% if estado_turno == "inactivo" %}
+                    selected
+                {% endif %}
+            >
+                Fuera de turno
+            </option>
+        </select>
+
+        <button
+            type="submit"
+            class="staff-filter-button"
+        >
+            <i class="fa-solid fa-magnifying-glass"></i>
+            Buscar
+        </button>
+
+    </form>
+
+    <div class="staff-table-wrapper">
+
+        <table class="staff-table">
+
+            <thead>
+                <tr>
+                    <th>Personal</th>
+                    <th>Especialidad</th>
+                    <th>Registro médico</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for miembro in personal %}
+
+                    <tr>
+
+                        <td>
+
+                            <div class="staff-person">
+
+                                <div class="staff-avatar">
+
+                                    {% if miembro.user.first_name %}
+                                        {{ miembro.user.first_name|first|upper }}
+                                    {% else %}
+                                        {{ miembro.user.username|first|upper }}
+                                    {% endif %}
+
+                                </div>
+
+                                <div>
+
+                                    <span class="staff-name">
+
+                                        {% if miembro.user.get_full_name %}
+                                            {{ miembro.user.get_full_name }}
+                                        {% else %}
+                                            {{ miembro.user.username }}
+                                        {% endif %}
+
+                                    </span>
+
+                                    <span class="staff-email">
+                                        {{ miembro.user.email|default:"Sin correo" }}
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+                        </td>
+
+                        <td>
+                            {{ miembro.especialidad|default:"Sin especialidad" }}
+                        </td>
+
+                        <td>
+                            {{ miembro.registro_medico|default:"Sin registro" }}
+                        </td>
+
+                        <td>
+
+                            {% if miembro.en_turno %}
+
+                                <span class="staff-status staff-status-active">
+                                    <i class="fa-solid fa-circle-check"></i>
+                                    En turno
+                                </span>
+
+                            {% else %}
+
+                                <span class="staff-status staff-status-inactive">
+                                    <i class="fa-solid fa-circle-minus"></i>
+                                    Fuera de turno
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+                        <td>
+
+                            <div class="staff-table-actions">
+
+                                <a
+                                    href="{% url 'personal_detalle' miembro.id %}"
+                                    class="staff-action"
+                                    title="Ver detalle"
+                                >
+                                    <i class="fa-solid fa-eye"></i>
+                                </a>
+
+                                <a
+                                    href="{% url 'personal_editar' miembro.id %}"
+                                    class="staff-action"
+                                    title="Editar"
+                                >
+                                    <i class="fa-solid fa-pen"></i>
+                                </a>
+
+                                <a
+                                    href="{% url 'personal_eliminar' miembro.id %}"
+                                    class="staff-action staff-action-danger"
+                                    title="Eliminar"
+                                >
+                                    <i class="fa-solid fa-trash"></i>
+                                </a>
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                {% empty %}
+
+                    <tr>
+                        <td colspan="5">
+
+                            <div class="staff-empty">
+
+                                <i class="fa-solid fa-user-doctor"></i>
+
+                                <h3>
+                                    No hay personal registrado
+                                </h3>
+
+                                <p>
+                                    Registra al primer miembro
+                                    del equipo médico.
+                                </p>
+
+                            </div>
+
+                        </td>
+                    </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+    {% if pagina.paginator.num_pages > 1 %}
+
+        <div class="staff-pagination">
+
+            {% if pagina.has_previous %}
+
+                <a
+                    href="?page={{ pagina.previous_page_number }}&buscar={{ busqueda }}&turno={{ estado_turno }}"
+                >
+                    Anterior
+                </a>
+
+            {% endif %}
+
+            <span>
+                Página {{ pagina.number }}
+                de {{ pagina.paginator.num_pages }}
+            </span>
+
+            {% if pagina.has_next %}
+
+                <a
+                    href="?page={{ pagina.next_page_number }}&buscar={{ busqueda }}&turno={{ estado_turno }}"
+                >
+                    Siguiente
+                </a>
+
+            {% endif %}
+
+        </div>
+
+    {% endif %}
+
+</section>
+
+{% endblock %}

@@ -1,0 +1,296 @@
+{% extends "core/base.html" %}
+
+{% block title %}
+    {{ titulo }}
+{% endblock %}
+
+{% block page_title %}
+    {{ titulo }}
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .staff-form-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 330px;
+        gap: 24px;
+    }
+
+    .staff-form-card,
+    .staff-form-aside {
+        padding: 28px;
+        border: 1px solid #e5e7eb;
+        border-radius: 22px;
+        background: white;
+    }
+
+    .staff-form-heading {
+        margin-bottom: 24px;
+    }
+
+    .staff-form-heading h2 {
+        margin: 0 0 7px;
+        color: #0f172a;
+    }
+
+    .staff-form-heading p {
+        margin: 0;
+        color: #64748b;
+    }
+
+    .staff-form-group {
+        margin-bottom: 20px;
+    }
+
+    .staff-form-group label {
+        display: block;
+        margin-bottom: 8px;
+        color: #334155;
+        font-weight: 800;
+    }
+
+    .form-control {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 13px 14px;
+        border: 1px solid #cbd5e1;
+        border-radius: 12px;
+        font-family: inherit;
+        outline: none;
+    }
+
+    .form-control:focus {
+        border-color: #2563eb;
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+    }
+
+    .staff-checkbox {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 14px;
+        border-radius: 12px;
+        background: #f8fafc;
+    }
+
+    .form-check-input {
+        width: 19px;
+        height: 19px;
+    }
+
+    .staff-error {
+        display: block;
+        margin-top: 6px;
+        color: #dc2626;
+        font-size: 13px;
+    }
+
+    .staff-form-actions {
+        display: flex;
+        gap: 12px;
+        margin-top: 28px;
+    }
+
+    .staff-save-button,
+    .staff-cancel-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 18px;
+        border-radius: 12px;
+        font-family: inherit;
+        font-weight: 800;
+        text-decoration: none;
+    }
+
+    .staff-save-button {
+        border: none;
+        color: white;
+        cursor: pointer;
+        background: #2563eb;
+    }
+
+    .staff-cancel-button {
+        color: #475569;
+        background: #f1f5f9;
+    }
+
+    .staff-form-aside {
+        color: white;
+        background: linear-gradient(145deg, #1d4ed8, #0ea5e9);
+    }
+
+    .staff-form-aside-icon {
+        display: grid;
+        place-items: center;
+        width: 90px;
+        height: 90px;
+        margin-bottom: 24px;
+        border-radius: 50%;
+        font-size: 44px;
+        background: rgba(255, 255, 255, 0.16);
+    }
+
+    .staff-form-aside h3 {
+        font-size: 24px;
+    }
+
+    .staff-form-aside p {
+        opacity: 0.9;
+        line-height: 1.7;
+    }
+
+    @media (max-width: 850px) {
+        .staff-form-layout {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="staff-form-layout">
+
+    <section class="staff-form-card">
+
+        <div class="staff-form-heading">
+
+            <h2>
+                {{ titulo }}
+            </h2>
+
+            <p>
+                Completa la información profesional
+                del miembro del equipo médico.
+            </p>
+
+        </div>
+
+        <form method="post">
+
+            {% csrf_token %}
+
+            {% if formulario.non_field_errors %}
+
+                {% for error in formulario.non_field_errors %}
+                    <span class="staff-error">
+                        {{ error }}
+                    </span>
+                {% endfor %}
+
+            {% endif %}
+
+            <div class="staff-form-group">
+
+                <label for="{{ formulario.user.id_for_label }}">
+                    Usuario
+                </label>
+
+                {{ formulario.user }}
+
+                {% for error in formulario.user.errors %}
+                    <span class="staff-error">
+                        {{ error }}
+                    </span>
+                {% endfor %}
+
+            </div>
+
+            <div class="staff-form-group">
+
+                <label for="{{ formulario.especialidad.id_for_label }}">
+                    Especialidad
+                </label>
+
+                {{ formulario.especialidad }}
+
+                {% for error in formulario.especialidad.errors %}
+                    <span class="staff-error">
+                        {{ error }}
+                    </span>
+                {% endfor %}
+
+            </div>
+
+            <div class="staff-form-group">
+
+                <label for="{{ formulario.registro_medico.id_for_label }}">
+                    Registro médico
+                </label>
+
+                {{ formulario.registro_medico }}
+
+                {% for error in formulario.registro_medico.errors %}
+                    <span class="staff-error">
+                        {{ error }}
+                    </span>
+                {% endfor %}
+
+            </div>
+
+            <div class="staff-form-group">
+
+                <div class="staff-checkbox">
+
+                    {{ formulario.en_turno }}
+
+                    <label for="{{ formulario.en_turno.id_for_label }}">
+                        Actualmente en turno
+                    </label>
+
+                </div>
+
+                {% for error in formulario.en_turno.errors %}
+                    <span class="staff-error">
+                        {{ error }}
+                    </span>
+                {% endfor %}
+
+            </div>
+
+            <div class="staff-form-actions">
+
+                <button
+                    type="submit"
+                    class="staff-save-button"
+                >
+                    <i class="fa-solid fa-floppy-disk"></i>
+                    {{ texto_boton }}
+                </button>
+
+                <a
+                    href="{% url 'medicos' %}"
+                    class="staff-cancel-button"
+                >
+                    Cancelar
+                </a>
+
+            </div>
+
+        </form>
+
+    </section>
+
+    <aside class="staff-form-aside">
+
+        <div class="staff-form-aside-icon">
+            <i class="fa-solid fa-user-doctor"></i>
+        </div>
+
+        <h3>
+            Equipo preparado para cuidar
+        </h3>
+
+        <p>
+            Mantén actualizada la especialidad,
+            el registro profesional y la
+            disponibilidad de cada miembro
+            del personal.
+        </p>
+
+    </aside>
+
+</div>
+
+{% endblock %}

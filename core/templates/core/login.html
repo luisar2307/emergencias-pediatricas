@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Emergencias Pediátricas - Login</title>
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+
+        body {
+
+            height: 100vh;
+
+            background-image: linear-gradient(
+                rgba(0, 70, 120, 0.65),
+                rgba(0, 0, 0, 0.55)
+            ),
+            url("https://images.unsplash.com/photo-1586773860418-d37222d8fce3");
+
+            background-size: cover;
+            background-position: center;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+        }
+
+
+
+        .login-container {
+
+            width: 380px;
+
+            background: white;
+
+            border-radius: 20px;
+
+            padding: 35px;
+
+            box-shadow: 0px 10px 30px rgba(0,0,0,0.3);
+
+            text-align: center;
+
+        }
+
+
+
+        .logo {
+
+            width: 90px;
+            height: 90px;
+
+            margin-bottom: 15px;
+
+        }
+
+
+
+        h1 {
+
+            color: #005b96;
+
+            font-size: 25px;
+
+            margin-bottom: 10px;
+
+        }
+
+
+
+        p {
+
+            color: #666;
+
+            margin-bottom: 25px;
+
+        }
+
+
+
+        .input-box {
+
+            text-align: left;
+
+            margin-bottom: 15px;
+
+        }
+
+
+
+        label {
+
+            color:#333;
+
+            font-weight:bold;
+
+        }
+
+
+
+        input {
+
+            width:100%;
+
+            padding:12px;
+
+            margin-top:5px;
+
+            border-radius:10px;
+
+            border:1px solid #ccc;
+
+            outline:none;
+
+            font-size:15px;
+
+        }
+
+
+
+        input:focus {
+
+            border-color:#0077b6;
+
+        }
+
+
+
+        button {
+
+            width:100%;
+
+            padding:13px;
+
+            margin-top:15px;
+
+            border:none;
+
+            border-radius:10px;
+
+            background:#d90429;
+
+            color:white;
+
+            font-size:17px;
+
+            font-weight:bold;
+
+            cursor:pointer;
+
+        }
+
+
+
+        button:hover {
+
+            background:#b00020;
+
+        }
+
+
+
+        .error {
+
+            color:red;
+
+            margin-top:15px;
+
+        }
+
+
+
+        .footer {
+
+            margin-top:20px;
+
+            font-size:13px;
+
+            color:#888;
+
+        }
+
+
+    </style>
+
+
+</head>
+
+
+<body>
+
+
+<div class="login-container">
+
+
+    <!-- Puedes cambiar esta imagen por un logo del hospital -->
+    <img 
+    class="logo"
+    src="https://cdn-icons-png.flaticon.com/512/2966/2966327.png"
+    >
+
+
+    <h1>
+        Emergencias Pediátricas
+    </h1>
+
+
+    <p>
+        Sistema de Gestión Hospitalaria
+    </p>
+
+
+
+    <form method="POST">
+
+        {% csrf_token %}
+
+
+        <div class="input-box">
+
+            <label>
+                Usuario
+            </label>
+
+            <input 
+            type="text"
+            name="username"
+            placeholder="Ingrese usuario"
+            required>
+
+        </div>
+
+
+
+        <div class="input-box">
+
+            <label>
+                Contraseña
+            </label>
+
+            <input 
+            type="password"
+            name="password"
+            placeholder="Ingrese contraseña"
+            required>
+
+        </div>
+
+
+
+        <button type="submit">
+
+            Ingresar
+
+        </button>
+
+
+    </form>
+
+
+
+    {% if error %}
+
+    <div class="error">
+
+        {{error}}
+
+    </div>
+
+    {% endif %}
+
+
+
+    <div class="footer">
+
+        © 2026 Sistema de Emergencias Pediátricas
+
+    </div>
+
+
+
+</div>
+
+
+</body>
+
+</html>

@@ -1,0 +1,410 @@
+{% extends "core/base.html" %}
+
+{% block title %}
+Triaje pediátrico
+{% endblock %}
+
+{% block content %}
+
+<style>
+    .page-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        margin-bottom: 24px;
+    }
+
+    .page-header h1 {
+        margin: 0;
+        color: #1e293b;
+    }
+
+    .page-header p {
+        margin: 6px 0 0;
+        color: #64748b;
+    }
+
+    .primary-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 18px;
+        border-radius: 10px;
+        background: #2563eb;
+        color: white;
+        text-decoration: none;
+        font-weight: 700;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(150px, 1fr));
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: 14px;
+        padding: 18px;
+        box-shadow: 0 4px 15px rgba(15, 23, 42, 0.07);
+    }
+
+    .stat-card span {
+        color: #64748b;
+        font-size: 14px;
+    }
+
+    .stat-card strong {
+        display: block;
+        margin-top: 8px;
+        font-size: 28px;
+        color: #0f172a;
+    }
+
+    .filters {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 20px;
+        padding: 18px;
+        background: white;
+        border-radius: 14px;
+    }
+
+    .filters input,
+    .filters select {
+        width: 100%;
+        padding: 11px;
+        border: 1px solid #cbd5e1;
+        border-radius: 9px;
+    }
+
+    .filter-button {
+        padding: 11px 18px;
+        border: none;
+        border-radius: 9px;
+        background: #0f172a;
+        color: white;
+        cursor: pointer;
+    }
+
+    .clear-button {
+        display: inline-flex;
+        align-items: center;
+        padding: 11px 18px;
+        border-radius: 9px;
+        background: #e2e8f0;
+        color: #334155;
+        text-decoration: none;
+    }
+
+    .table-container {
+        overflow-x: auto;
+        background: white;
+        border-radius: 14px;
+        box-shadow: 0 4px 15px rgba(15, 23, 42, 0.07);
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    th,
+    td {
+        padding: 14px;
+        text-align: left;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    th {
+        background: #f8fafc;
+        color: #475569;
+        font-size: 13px;
+    }
+
+    .badge {
+        display: inline-block;
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .badge-critico {
+        color: #991b1b;
+        background: #fee2e2;
+    }
+
+    .badge-urgente {
+        color: #9a3412;
+        background: #ffedd5;
+    }
+
+    .badge-moderado {
+        color: #854d0e;
+        background: #fef9c3;
+    }
+
+    .badge-normal {
+        color: #166534;
+        background: #dcfce7;
+    }
+
+    .actions {
+        display: flex;
+        gap: 7px;
+    }
+
+    .action-button {
+        padding: 7px 10px;
+        border-radius: 7px;
+        background: #e2e8f0;
+        color: #1e293b;
+        text-decoration: none;
+    }
+
+    .action-button.danger {
+        background: #fee2e2;
+        color: #b91c1c;
+    }
+
+    .empty-state {
+        padding: 50px;
+        text-align: center;
+        color: #64748b;
+    }
+
+    .pagination {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        margin-top: 22px;
+    }
+
+    .pagination a,
+    .pagination span {
+        padding: 9px 13px;
+        border-radius: 8px;
+        background: white;
+        color: #334155;
+        text-decoration: none;
+    }
+
+    @media (max-width: 1000px) {
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .filters {
+            flex-direction: column;
+        }
+    }
+</style>
+
+<div class="page-header">
+    <div>
+        <h1>Triaje pediátrico</h1>
+        <p>Evaluación y clasificación de pacientes.</p>
+    </div>
+
+    <a href="{% url 'triaje_crear' %}" class="primary-button">
+        ＋ Nuevo triaje
+    </a>
+</div>
+
+{% if messages %}
+    {% for message in messages %}
+        <div style="
+            padding: 14px;
+            margin-bottom: 16px;
+            border-radius: 10px;
+            background: #dcfce7;
+            color: #166534;
+        ">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <span>Total</span>
+        <strong>{{ total_triajes }}</strong>
+    </div>
+
+    <div class="stat-card">
+        <span>Críticos</span>
+        <strong>{{ total_criticos }}</strong>
+    </div>
+
+    <div class="stat-card">
+        <span>Urgentes</span>
+        <strong>{{ total_urgentes }}</strong>
+    </div>
+
+    <div class="stat-card">
+        <span>Moderados</span>
+        <strong>{{ total_moderados }}</strong>
+    </div>
+
+    <div class="stat-card">
+        <span>Normales</span>
+        <strong>{{ total_normales }}</strong>
+    </div>
+</div>
+
+<form method="get" class="filters">
+    <input
+        type="text"
+        name="buscar"
+        value="{{ busqueda }}"
+        placeholder="Buscar por paciente o historia clínica"
+    >
+
+    <select name="nivel">
+        <option value="">Todos los niveles</option>
+
+        {% for valor, texto in niveles %}
+            <option
+                value="{{ valor }}"
+                {% if nivel_seleccionado == valor %}selected{% endif %}
+            >
+                {{ texto }}
+            </option>
+        {% endfor %}
+    </select>
+
+    <button type="submit" class="filter-button">
+        Buscar
+    </button>
+
+    <a href="{% url 'triaje' %}" class="clear-button">
+        Limpiar
+    </a>
+</form>
+
+<div class="table-container">
+    {% if triajes %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Paciente</th>
+                    <th>Personal médico</th>
+                    <th>F. cardíaca</th>
+                    <th>F. respiratoria</th>
+                    <th>Temperatura</th>
+                    <th>SpO₂</th>
+                    <th>Nivel</th>
+                    <th>Fecha</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for triaje in triajes %}
+                    <tr>
+                        <td>
+                            {{ triaje.paciente.nombre }}
+                            {{ triaje.paciente.apellido }}
+                        </td>
+
+                        <td>
+                            {{ triaje.personal|default:"Sin asignar" }}
+                        </td>
+
+                        <td>
+                            {{ triaje.frecuencia_cardiaca|default:"—" }}
+                        </td>
+
+                        <td>
+                            {{ triaje.frecuencia_respiratoria|default:"—" }}
+                        </td>
+
+                        <td>
+                            {% if triaje.temperatura %}
+                                {{ triaje.temperatura }} °C
+                            {% else %}
+                                —
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {% if triaje.saturacion_oxigeno %}
+                                {{ triaje.saturacion_oxigeno }} %
+                            {% else %}
+                                —
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            <span class="badge badge-{{ triaje.nivel_urgencia }}">
+                                {{ triaje.get_nivel_urgencia_display }}
+                            </span>
+                        </td>
+
+                        <td>
+                            {{ triaje.fecha_registro|date:"d/m/Y H:i" }}
+                        </td>
+
+                        <td>
+                            <div class="actions">
+                                <a
+                                    href="{% url 'triaje_detalle' triaje.id %}"
+                                    class="action-button"
+                                    title="Ver"
+                                >
+                                    👁
+                                </a>
+
+                                <a
+                                    href="{% url 'triaje_editar' triaje.id %}"
+                                    class="action-button"
+                                    title="Editar"
+                                >
+                                    ✎
+                                </a>
+
+                                <a
+                                    href="{% url 'triaje_eliminar' triaje.id %}"
+                                    class="action-button danger"
+                                    title="Eliminar"
+                                >
+                                    🗑
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="empty-state">
+            <h3>No existen registros de triaje</h3>
+            <p>Registra la primera evaluación del paciente.</p>
+        </div>
+    {% endif %}
+</div>
+
+{% if pagina.has_other_pages %}
+    <div class="pagination">
+        {% if pagina.has_previous %}
+            <a href="?page={{ pagina.previous_page_number }}&buscar={{ busqueda }}&nivel={{ nivel_seleccionado }}">
+                Anterior
+            </a>
+        {% endif %}
+
+        <span>
+            Página {{ pagina.number }} de {{ pagina.paginator.num_pages }}
+        </span>
+
+        {% if pagina.has_next %}
+            <a href="?page={{ pagina.next_page_number }}&buscar={{ busqueda }}&nivel={{ nivel_seleccionado }}">
+                Siguiente
+            </a>
+        {% endif %}
+    </div>
+{% endif %}
+
+{% endblock %}

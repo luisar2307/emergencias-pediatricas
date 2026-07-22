@@ -1,0 +1,243 @@
+{% extends "core/base.html" %}
+
+{% block title %}
+    Detalle del personal
+{% endblock %}
+
+{% block page_title %}
+    Perfil del personal
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .staff-detail-card {
+        max-width: 850px;
+        margin: 0 auto;
+        overflow: hidden;
+        border: 1px solid #e5e7eb;
+        border-radius: 24px;
+        background: white;
+    }
+
+    .staff-detail-header {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        padding: 30px;
+        color: white;
+        background: linear-gradient(135deg, #2563eb, #0ea5e9);
+    }
+
+    .staff-detail-avatar {
+        display: grid;
+        place-items: center;
+        width: 88px;
+        height: 88px;
+        border-radius: 50%;
+        font-size: 34px;
+        font-weight: 800;
+        background: rgba(255, 255, 255, 0.2);
+    }
+
+    .staff-detail-header h2 {
+        margin: 0 0 5px;
+    }
+
+    .staff-detail-header p {
+        margin: 0;
+        opacity: 0.9;
+    }
+
+    .staff-detail-body {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 18px;
+        padding: 30px;
+    }
+
+    .staff-detail-field {
+        padding: 18px;
+        border-radius: 14px;
+        background: #f8fafc;
+    }
+
+    .staff-detail-label {
+        display: block;
+        margin-bottom: 6px;
+        color: #64748b;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .staff-detail-value {
+        color: #0f172a;
+        font-weight: 800;
+    }
+
+    .staff-detail-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        padding: 0 30px 30px;
+    }
+
+    .staff-detail-actions a {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 11px 16px;
+        border-radius: 11px;
+        font-weight: 800;
+        text-decoration: none;
+    }
+
+    .staff-detail-back {
+        color: #475569;
+        background: #f1f5f9;
+    }
+
+    .staff-detail-edit {
+        color: white;
+        background: #2563eb;
+    }
+
+    .staff-detail-delete {
+        color: #b91c1c;
+        background: #fee2e2;
+    }
+
+    @media (max-width: 650px) {
+        .staff-detail-body {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<section class="staff-detail-card">
+
+    <header class="staff-detail-header">
+
+        <div class="staff-detail-avatar">
+
+            {% if personal.user.first_name %}
+                {{ personal.user.first_name|first|upper }}
+            {% else %}
+                {{ personal.user.username|first|upper }}
+            {% endif %}
+
+        </div>
+
+        <div>
+
+            <h2>
+
+                {% if personal.user.get_full_name %}
+                    {{ personal.user.get_full_name }}
+                {% else %}
+                    {{ personal.user.username }}
+                {% endif %}
+
+            </h2>
+
+            <p>
+                {{ personal.especialidad|default:"Personal médico" }}
+            </p>
+
+        </div>
+
+    </header>
+
+    <div class="staff-detail-body">
+
+        <div class="staff-detail-field">
+            <span class="staff-detail-label">
+                Usuario
+            </span>
+
+            <span class="staff-detail-value">
+                {{ personal.user.username }}
+            </span>
+        </div>
+
+        <div class="staff-detail-field">
+            <span class="staff-detail-label">
+                Correo electrónico
+            </span>
+
+            <span class="staff-detail-value">
+                {{ personal.user.email|default:"No registrado" }}
+            </span>
+        </div>
+
+        <div class="staff-detail-field">
+            <span class="staff-detail-label">
+                Especialidad
+            </span>
+
+            <span class="staff-detail-value">
+                {{ personal.especialidad|default:"No registrada" }}
+            </span>
+        </div>
+
+        <div class="staff-detail-field">
+            <span class="staff-detail-label">
+                Registro médico
+            </span>
+
+            <span class="staff-detail-value">
+                {{ personal.registro_medico|default:"No registrado" }}
+            </span>
+        </div>
+
+        <div class="staff-detail-field">
+            <span class="staff-detail-label">
+                Estado del turno
+            </span>
+
+            <span class="staff-detail-value">
+
+                {% if personal.en_turno %}
+                    En turno
+                {% else %}
+                    Fuera de turno
+                {% endif %}
+
+            </span>
+        </div>
+
+    </div>
+
+    <div class="staff-detail-actions">
+
+        <a
+            href="{% url 'medicos' %}"
+            class="staff-detail-back"
+        >
+            <i class="fa-solid fa-arrow-left"></i>
+            Volver
+        </a>
+
+        <a
+            href="{% url 'personal_editar' personal.id %}"
+            class="staff-detail-edit"
+        >
+            <i class="fa-solid fa-pen"></i>
+            Editar
+        </a>
+
+        <a
+            href="{% url 'personal_eliminar' personal.id %}"
+            class="staff-detail-delete"
+        >
+            <i class="fa-solid fa-trash"></i>
+            Eliminar
+        </a>
+
+    </div>
+
+</section>
+
+{% endblock %}

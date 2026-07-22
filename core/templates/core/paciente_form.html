@@ -1,0 +1,481 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Registrar paciente</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f4f7fb;
+            color: #1f2937;
+        }
+
+        .page-container {
+            width: 100%;
+            min-height: 100vh;
+        }
+
+        .topbar {
+            height: 78px;
+            background: #ffffff;
+            border-bottom: 1px solid #dfe7f1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 42px;
+            box-shadow: 0 2px 10px rgba(15, 23, 42, 0.05);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .brand-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #2563eb, #0ea5e9);
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 25px;
+        }
+
+        .brand-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .brand-subtitle {
+            margin-top: 4px;
+            font-size: 13px;
+            color: #64748b;
+        }
+
+        .back-link {
+            text-decoration: none;
+            background: #ffffff;
+            color: #334155;
+            border: 1px solid #cbd5e1;
+            padding: 11px 18px;
+            border-radius: 9px;
+            font-weight: 700;
+            font-size: 14px;
+            transition: 0.2s;
+        }
+
+        .back-link:hover {
+            background: #f8fafc;
+            border-color: #94a3b8;
+        }
+
+        .content {
+            width: calc(100% - 80px);
+            max-width: 1400px;
+            margin: 34px auto 60px;
+        }
+
+        .page-title {
+            margin-bottom: 24px;
+        }
+
+        .page-title h1 {
+            font-size: 32px;
+            color: #0f172a;
+        }
+
+        .page-title p {
+            margin-top: 8px;
+            font-size: 15px;
+            color: #64748b;
+        }
+
+        .form-card {
+            background: #ffffff;
+            border: 1px solid #dfe7f1;
+            border-radius: 18px;
+            box-shadow: 0 14px 35px rgba(15, 23, 42, 0.08);
+            overflow: hidden;
+        }
+
+        .form-header {
+            background: linear-gradient(135deg, #1d4ed8, #2563eb);
+            color: #ffffff;
+            padding: 28px 34px;
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .form-header-icon {
+            width: 58px;
+            height: 58px;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.16);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 29px;
+        }
+
+        .form-header h2 {
+            font-size: 23px;
+        }
+
+        .form-header p {
+            margin-top: 6px;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.82);
+        }
+
+        .form-body {
+            padding: 34px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 24px 28px;
+        }
+
+        .field-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .field-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .field-group label {
+            margin-bottom: 8px;
+            color: #334155;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .required {
+            color: #dc2626;
+        }
+
+        .field-group input,
+        .field-group select,
+        .field-group textarea {
+            width: 100%;
+            border: 1px solid #cbd5e1;
+            border-radius: 9px;
+            padding: 12px 13px;
+            background: #ffffff;
+            color: #0f172a;
+            font-size: 14px;
+            outline: none;
+            transition: 0.2s;
+        }
+
+        .field-group textarea {
+            min-height: 110px;
+            resize: vertical;
+        }
+
+        .field-group input:focus,
+        .field-group select:focus,
+        .field-group textarea:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+        }
+
+        .field-help {
+            margin-top: 6px;
+            color: #64748b;
+            font-size: 12px;
+        }
+
+        .field-error {
+            margin-top: 7px;
+            color: #dc2626;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .general-errors {
+            margin-bottom: 24px;
+            padding: 14px 16px;
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 10px;
+            color: #b91c1c;
+        }
+
+        .general-errors ul {
+            margin-left: 18px;
+        }
+
+        .form-footer {
+            margin-top: 34px;
+            padding-top: 24px;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        .cancel-button,
+        .save-button {
+            min-width: 150px;
+            border: none;
+            border-radius: 9px;
+            padding: 12px 20px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            transition: 0.2s;
+        }
+
+        .cancel-button {
+            background: #ffffff;
+            color: #475569;
+            border: 1px solid #cbd5e1;
+        }
+
+        .cancel-button:hover {
+            background: #f8fafc;
+        }
+
+        .save-button {
+            background: #2563eb;
+            color: #ffffff;
+            box-shadow: 0 8px 18px rgba(37, 99, 235, 0.22);
+        }
+
+        .save-button:hover {
+            background: #1d4ed8;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="page-container">
+
+    <header class="topbar">
+        <div class="brand">
+            <div class="brand-icon">✚</div>
+
+            <div>
+                <div class="brand-title">
+                    Emergencias Pediátricas
+                </div>
+
+                <div class="brand-subtitle">
+                    Gestión de pacientes
+                </div>
+            </div>
+        </div>
+
+        <a
+            href="{% url 'pacientes' %}"
+            class="back-link"
+        >
+            ← Volver al listado
+        </a>
+    </header>
+
+    <main class="content">
+
+        <div class="page-title">
+            <h1>Registrar nuevo paciente</h1>
+
+            <p>
+                Complete la información clínica y personal del paciente.
+            </p>
+        </div>
+
+        <section class="form-card">
+
+            <div class="form-header">
+                <div class="form-header-icon">👶</div>
+
+                <div>
+                    <h2>Datos del paciente</h2>
+
+                    <p>
+                        Los campos marcados con asterisco son obligatorios.
+                    </p>
+                </div>
+            </div>
+
+            <form method="post" class="form-body">
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                    <div class="general-errors">
+                        {{ form.non_field_errors }}
+                    </div>
+                {% endif %}
+
+                <div class="form-grid">
+
+                    <div class="field-group">
+                        <label for="{{ form.historia_clinica.id_for_label }}">
+                            Historia clínica
+                            <span class="required">*</span>
+                        </label>
+
+                        {{ form.historia_clinica }}
+
+                        {% for error in form.historia_clinica.errors %}
+                            <div class="field-error">
+                                {{ error }}
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="field-group">
+                        <label for="{{ form.fecha_nacimiento.id_for_label }}">
+                            Fecha de nacimiento
+                            <span class="required">*</span>
+                        </label>
+
+                        {{ form.fecha_nacimiento }}
+
+                        {% for error in form.fecha_nacimiento.errors %}
+                            <div class="field-error">
+                                {{ error }}
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="field-group">
+                        <label for="{{ form.nombre.id_for_label }}">
+                            Nombres
+                            <span class="required">*</span>
+                        </label>
+
+                        {{ form.nombre }}
+
+                        {% for error in form.nombre.errors %}
+                            <div class="field-error">
+                                {{ error }}
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="field-group">
+                        <label for="{{ form.apellido.id_for_label }}">
+                            Apellidos
+                            <span class="required">*</span>
+                        </label>
+
+                        {{ form.apellido }}
+
+                        {% for error in form.apellido.errors %}
+                            <div class="field-error">
+                                {{ error }}
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="field-group">
+                        <label for="{{ form.sexo.id_for_label }}">
+                            Sexo
+                            <span class="required">*</span>
+                        </label>
+
+                        {{ form.sexo }}
+
+                        {% for error in form.sexo.errors %}
+                            <div class="field-error">
+                                {{ error }}
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="field-group">
+                        <label for="{{ form.nombre_tutor.id_for_label }}">
+                            Tutor o representante
+                        </label>
+
+                        {{ form.nombre_tutor }}
+
+                        {% for error in form.nombre_tutor.errors %}
+                            <div class="field-error">
+                                {{ error }}
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="field-group">
+                        <label for="{{ form.telefono_emergencia.id_for_label }}">
+                            Teléfono de emergencia
+                        </label>
+
+                        {{ form.telefono_emergencia }}
+
+                        {% for error in form.telefono_emergencia.errors %}
+                            <div class="field-error">
+                                {{ error }}
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="field-group full-width">
+                        <label for="{{ form.alergias.id_for_label }}">
+                            Alergias conocidas
+                        </label>
+
+                        {{ form.alergias }}
+
+                        <div class="field-help">
+                            Escriba “Ninguna” cuando no existan alergias conocidas.
+                        </div>
+
+                        {% for error in form.alergias.errors %}
+                            <div class="field-error">
+                                {{ error }}
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                </div>
+
+                <div class="form-footer">
+                    <a
+                        href="{% url 'pacientes' %}"
+                        class="cancel-button"
+                    >
+                        Cancelar
+                    </a>
+
+                    <button
+                        type="submit"
+                        class="save-button"
+                    >
+                        Guardar paciente
+                    </button>
+                </div>
+
+            </form>
+
+        </section>
+
+    </main>
+
+</div>
+
+</body>
+</html>
